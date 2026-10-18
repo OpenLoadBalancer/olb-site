@@ -3,8 +3,8 @@
 export function artwork(mono = false, light = false) {
   const ink = mono
     ? light
-      ? "#f1f1e9"
-      : "#202820"
+      ? "#edf4fc"
+      : "#142d49"
     : light
       ? "#69adfa"
       : "#0863b9";
@@ -14,7 +14,7 @@ export function artwork(mono = false, light = false) {
     <path d="m42.2 15.3 5.8-9 5.8 9-5.8-3.6Z" fill="${ink}" stroke-width="3.8"/>
     <path d="M24 19 14 21l4 10M72 19l10 2-4 10M13 46.5 5.5 52l7.5 5.5M83 46.5l7.5 5.5-7.5 5.5" stroke-width="3.8"/>
     <path d="M39 77h18v9c0 1.2-.5 1.8-1.5 2.4l-6 3.4a3 3 0 0 1-3 0l-6-3.4C39.5 87.8 39 87.2 39 86Z" fill="${ink}" stroke="none"/>
-    <path d="m43 79 5-2 5 2-5 3Zm5 3v3" stroke="${light && mono ? "#111312" : "#ffffff"}" stroke-width="2.2"/>
+    <path d="m43 79 5-2 5 2-5 3Zm5 3v3" stroke="${light && mono ? "#0a1220" : "#ffffff"}" stroke-width="2.2"/>
   </g>`;
 }
 export function mark(body = artwork()) {

@@ -5,4 +5,4 @@
     <path d="M24 19 14 21l4 10M72 19l10 2-4 10M13 46.5 5.5 52l7.5 5.5M83 46.5l7.5 5.5-7.5 5.5" stroke-width="3.8"/>
     <path d="M39 77h18v9c0 1.2-.5 1.8-1.5 2.4l-6 3.4a3 3 0 0 1-3 0l-6-3.4C39.5 87.8 39 87.2 39 86Z" fill="#69adfa" stroke="none"/>
     <path d="m43 79 5-2 5 2-5 3Zm5 3v3" stroke="#ffffff" stroke-width="2.2"/>
-  </g></g><text x="92" y="49" fill="#f1f1e9" font-size="29" font-family="Arial,sans-serif" letter-spacing="-1"><tspan font-weight="300">Open</tspan><tspan font-weight="700">LoadBalancer</tspan></text></svg>
+  </g></g><text x="92" y="49" fill="#edf4fc" font-size="29" font-family="Arial,sans-serif" letter-spacing="-1"><tspan font-weight="300">Open</tspan><tspan font-weight="700">LoadBalancer</tspan></text></svg>

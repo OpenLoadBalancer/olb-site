@@ -5,16 +5,18 @@
   font-display: swap;
 }
 :root {
-  --bg: #111312;
-  --surface: #171a18;
-  --surface-2: #1c201d;
-  --text: #f1f1e9;
-  --muted: #a1aaa3;
-  --border: #303631;
-  --border-strong: #505c52;
-  --accent: #ff886b;
-  --accent-ink: #161613;
-  --green: #9eccac;
+  --bg: #0a1220;
+  --surface: #101d30;
+  --surface-2: #192b43;
+  --text: #edf4fc;
+  --muted: #a0b3cc;
+  --border: #293d57;
+  --border-strong: #577597;
+  --accent: #69adfa;
+  --accent-ink: #071a30;
+  --green: #71d6b3;
+  --danger: #f58e9b;
+  --code: #b4d3f8;
   --gutter: clamp(22px, 4.3vw, 92px);
   --section: clamp(76px, 7.5vw, 142px);
   --max: 1720px;
@@ -24,16 +26,18 @@
   color-scheme: dark;
 }
 :root[data-theme="light"] {
-  --bg: #f6f5ef;
-  --surface: #edeee7;
-  --surface-2: #e5e8df;
-  --text: #202820;
-  --muted: #59645c;
-  --border: #d4d9cf;
-  --border-strong: #aab4a6;
-  --accent: #b7442c;
-  --accent-ink: #fff9ef;
-  --green: #286b44;
+  --bg: #f7faff;
+  --surface: #edf3fb;
+  --surface-2: #e2ecf8;
+  --text: #142d49;
+  --muted: #526985;
+  --border: #cedcee;
+  --border-strong: #849ab5;
+  --accent: #0863b9;
+  --accent-ink: #ffffff;
+  --green: #187451;
+  --danger: #be3550;
+  --code: #245887;
   --oxog-pink: #ed0878;
   --oxog-purple: #692d91;
   color-scheme: light;
@@ -530,10 +534,10 @@ h1 {
   stroke: var(--muted);
 }
 .failover .backend-two .backend-status {
-  fill: var(--accent);
+  fill: var(--danger);
 }
 .failover .backend-two .diagram-node {
-  stroke: var(--accent);
+  stroke: var(--danger);
   stroke-dasharray: 3 3;
 }
 .console-controls {
@@ -917,7 +921,7 @@ pre {
   line-height: 1.9;
   overflow: auto;
   tab-size: 2;
-  color: var(--green);
+  color: var(--code);
 }
 .code-line {
   display: flex;
@@ -1258,12 +1262,12 @@ pre {
   height: auto;
 }
 .brand-tile:first-child {
-  background: #111312;
-  color: #f1f1e9;
+  background: #0a1220;
+  color: #edf4fc;
 }
 .brand-tile:nth-child(2) {
-  background: #f6f5ef;
-  color: #202820;
+  background: #f7faff;
+  color: #142d49;
 }
 .brand-tile a {
   font-size: 12px;

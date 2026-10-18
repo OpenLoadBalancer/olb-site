@@ -179,7 +179,7 @@ export function Site({
         <title>{title}</title>
         <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#111312" />
+        <meta name="theme-color" content="#0a1220" />
         <link rel="canonical" href={`https://openloadbalancer.dev${path}`} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
