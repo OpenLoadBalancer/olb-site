@@ -94,7 +94,6 @@ export function createSvgBackground(
     echo: el.querySelector("[data-echo]")!,
     sparks: [...el.querySelectorAll("[data-spark]")],
   }));
-  const media = matchMedia("(prefers-reduced-motion: reduce)");
   let width = 1,
     height = 1,
     columns = 1,
@@ -276,10 +275,10 @@ export function createSvgBackground(
     }));
   }
   function draw(now: number, dt = 0) {
-    origin = scrollY * (media.matches ? 1 : BACKGROUND.parallax);
+    origin = scrollY * BACKGROUND.parallax;
     layout();
-    if (dirty && (media.matches || time - lastRegions > 0.06)) collectRegions();
-    const intro = media.matches ? 1 : ease(entered / 0.8);
+    if (dirty && time - lastRegions > 0.06) collectRegions();
+    const intro = ease(entered / 0.8);
     svg.style.opacity = String(intro);
     feedback.style.opacity = String(intro);
     bursts = bursts.filter((b) => now - b.born < BACKGROUND.burstLife);
@@ -294,74 +293,70 @@ export function createSvgBackground(
         targetTurn = 0,
         resonance = 0,
         resonanceAge = 0;
-      if (!media.matches) {
-        x +=
-          Math.sin(time * (0.12 + shape.depth * 0.08) + shape.seed) *
-          BACKGROUND.drift *
-          shape.depth;
-        y +=
-          Math.cos(time * (0.09 + shape.depth * 0.05) + shape.seed) *
-          BACKGROUND.drift;
-        y += Math.sin(scrollY / 900 + shape.seed) * 8 * shape.depth;
-      }
+      x +=
+        Math.sin(time * (0.12 + shape.depth * 0.08) + shape.seed) *
+        BACKGROUND.drift *
+        shape.depth;
+      y +=
+        Math.cos(time * (0.09 + shape.depth * 0.05) + shape.seed) *
+        BACKGROUND.drift;
+      y += Math.sin(scrollY / 900 + shape.seed) * 8 * shape.depth;
       if (y < -50 || y > height + 50) {
         if (node.getAttribute("visibility") !== "hidden")
           attr(node, "visibility", "hidden");
         attr(reactive[i].el, "visibility", "hidden");
         continue;
       }
-      if (!media.matches) {
-        const d = Math.hypot(x - pointer.x, y - pointer.y);
-        const influence =
-          ease(1 - d / quality().radius) *
-          ease(d / BACKGROUND.forceCore) *
-          pointer.strength;
-        const force =
-          influence *
-          BACKGROUND.force *
-          shape.depth *
-          (shape.type % 2 ? -0.7 : 1);
-        const phase = time * (0.85 + shape.depth * 0.2) + shape.seed;
-        const curl = Math.sin(phase) * (mobile ? 45 : 92) * influence;
-        const breath = Math.cos(phase) * 30 * influence;
-        reaction = ease(1 - d / quality().radius) * pointer.strength;
-        if (d > 0.1) {
-          const ux = (x - pointer.x) / d,
-            uy = (y - pointer.y) / d;
-          targetX += ux * (force + breath) - uy * curl;
-          targetY += uy * (force + breath) + ux * curl;
-          targetTurn += Math.sin(phase + 0.7) * 48 * influence;
+      const d = Math.hypot(x - pointer.x, y - pointer.y);
+      const influence =
+        ease(1 - d / quality().radius) *
+        ease(d / BACKGROUND.forceCore) *
+        pointer.strength;
+      const force =
+        influence *
+        BACKGROUND.force *
+        shape.depth *
+        (shape.type % 2 ? -0.7 : 1);
+      const phase = time * (0.85 + shape.depth * 0.2) + shape.seed;
+      const curl = Math.sin(phase) * (mobile ? 45 : 92) * influence;
+      const breath = Math.cos(phase) * 30 * influence;
+      reaction = ease(1 - d / quality().radius) * pointer.strength;
+      if (d > 0.1) {
+        const ux = (x - pointer.x) / d,
+          uy = (y - pointer.y) / d;
+        targetX += ux * (force + breath) - uy * curl;
+        targetY += uy * (force + breath) + ux * curl;
+        targetTurn += Math.sin(phase + 0.7) * 48 * influence;
+      }
+      for (const b of bursts) {
+        const age = clamp((now - b.born) / BACKGROUND.burstLife);
+        const dy = y - b.y,
+          dx = x - b.x,
+          distance = Math.hypot(dx, dy);
+        const push =
+          Math.max(0, 1 - Math.abs(distance - ease(age) * radius()) / 85) *
+          (1 - age) *
+          ease(age / 0.08) *
+          ease(distance / BACKGROUND.forceCore) *
+          52 *
+          b.power;
+        reaction = Math.max(reaction, Math.min(1, push / 28));
+        if (distance > 0.1) {
+          targetX += (dx / distance) * push;
+          targetY += (dy / distance) * push;
         }
-        for (const b of bursts) {
-          const age = clamp((now - b.born) / BACKGROUND.burstLife);
-          const dy = y - b.y,
-            dx = x - b.x,
-            distance = Math.hypot(dx, dy);
-          const push =
-            Math.max(0, 1 - Math.abs(distance - ease(age) * radius()) / 85) *
-            (1 - age) *
-            ease(age / 0.08) *
-            ease(distance / BACKGROUND.forceCore) *
-            52 *
-            b.power;
-          reaction = Math.max(reaction, Math.min(1, push / 28));
-          if (distance > 0.1) {
-            targetX += (dx / distance) * push;
-            targetY += (dy / distance) * push;
-          }
-          for (const signal of b.relays) {
-            if (signal.seed !== shape.seed) continue;
-            const age = (now - b.born - signal.arrival) / BACKGROUND.relayLife;
-            if (age < 0 || age >= 1) continue;
-            const pulse = Math.sin(Math.PI * age) ** 2 * signal.power * b.power;
-            targetX += Math.cos(signal.angle + age * 1.4) * pulse * 58;
-            targetY += Math.sin(signal.angle + age * 1.4) * pulse * 58;
-            targetTurn += Math.sin(age * Math.PI * 2) * pulse * 44;
-            reaction = Math.max(reaction, Math.min(1, pulse));
-            if (pulse > resonance) {
-              resonance = pulse;
-              resonanceAge = age;
-            }
+        for (const signal of b.relays) {
+          if (signal.seed !== shape.seed) continue;
+          const age = (now - b.born - signal.arrival) / BACKGROUND.relayLife;
+          if (age < 0 || age >= 1) continue;
+          const pulse = Math.sin(Math.PI * age) ** 2 * signal.power * b.power;
+          targetX += Math.cos(signal.angle + age * 1.4) * pulse * 58;
+          targetY += Math.sin(signal.angle + age * 1.4) * pulse * 58;
+          targetTurn += Math.sin(age * Math.PI * 2) * pulse * 44;
+          reaction = Math.max(reaction, Math.min(1, pulse));
+          if (pulse > resonance) {
+            resonance = pulse;
+            resonanceAge = age;
           }
         }
       }
@@ -378,21 +373,13 @@ export function createSvgBackground(
         const target = axis === "x" ? targetX : targetY;
         const displacement = shape.offset[axis] - target;
         const impulse = (shape.velocity[axis] + omega * displacement) * dt;
-        shape.offset[axis] = media.matches
-          ? 0
-          : target + (displacement + impulse) * decay;
-        shape.velocity[axis] = media.matches
-          ? 0
-          : (shape.velocity[axis] - omega * impulse) * decay;
+        shape.offset[axis] = target + (displacement + impulse) * decay;
+        shape.velocity[axis] = (shape.velocity[axis] - omega * impulse) * decay;
       }
       const turnDelta = shape.turn - targetTurn;
       const angularImpulse = (shape.spin + omega * turnDelta) * dt;
-      shape.turn = media.matches
-        ? 0
-        : targetTurn + (turnDelta + angularImpulse) * decay;
-      shape.spin = media.matches
-        ? 0
-        : (shape.spin - omega * angularImpulse) * decay;
+      shape.turn = targetTurn + (turnDelta + angularImpulse) * decay;
+      shape.spin = (shape.spin - omega * angularImpulse) * decay;
       x += shape.offset.x;
       y += shape.offset.y;
       const edge = ease(
@@ -420,7 +407,7 @@ export function createSvgBackground(
         ).toFixed(3),
       );
       const highlight = reactive[i];
-      if (media.matches || reaction < 0.015) {
+      if (reaction < 0.015) {
         if (highlight.el.getAttribute("visibility") !== "hidden")
           attr(highlight.el, "visibility", "hidden");
       } else {
@@ -466,7 +453,7 @@ export function createSvgBackground(
         (-(time * (6 + (Math.abs(worldRow) % 3)) + worldRow * 113)).toFixed(2),
       );
     }
-    const tracking = !media.matches && pointer.strength > 0.015;
+    const tracking = pointer.strength > 0.015;
     attr(halo, "visibility", tracking ? "visible" : "hidden");
     if (tracking) {
       attr(
@@ -478,12 +465,8 @@ export function createSvgBackground(
       attr(haloRing, "r", (26 + Math.sin(time * 2.5) * 3).toFixed(2));
     }
     trail = trail.filter((p) => now - p.born < BACKGROUND.trailLife);
-    attr(
-      trailGroup,
-      "visibility",
-      !media.matches && trail.length > 1 ? "visible" : "hidden",
-    );
-    if (!media.matches && trail.length > 1) {
+    attr(trailGroup, "visibility", trail.length > 1 ? "visible" : "hidden");
+    if (trail.length > 1) {
       let d = `M${trail[0].x} ${trail[0].y}`;
       for (let i = 1; i < trail.length - 1; i++)
         d += `Q${trail[i].x} ${trail[i].y} ${(trail[i].x + trail[i + 1].x) / 2} ${(trail[i].y + trail[i + 1].y) / 2}`;
@@ -506,7 +489,7 @@ export function createSvgBackground(
     for (let i = 0; i < effects.length; i++) {
       const effect = effects[i],
         b = bursts[i];
-      if (!b || media.matches) {
+      if (!b) {
         if (effect.el.getAttribute("visibility") !== "hidden")
           attr(effect.el, "visibility", "hidden");
         continue;
@@ -542,7 +525,7 @@ export function createSvgBackground(
   const radius = () => Math.min(BACKGROUND.burstRadius, width * 0.48);
   function tick(stamp: number) {
     raf = 0;
-    if (disposed || !visible || document.hidden || media.matches) return;
+    if (disposed || !visible || document.hidden) return;
     const fps =
       time - lastInput < BACKGROUND.idleAfter
         ? quality().fps
@@ -559,39 +542,23 @@ export function createSvgBackground(
     raf = requestAnimationFrame(tick);
   }
   function sync() {
+    if (disposed) return;
     cancelAnimationFrame(raf);
     raf = 0;
     last = 0;
-    const state = media.matches
-      ? "reduced"
-      : visible && !document.hidden
-        ? "running"
-        : "paused";
+    const state = visible && !document.hidden ? "running" : "paused";
     attr(svg, "data-motion", state);
     attr(feedback, "data-motion", state);
     if (state === "running") raf = requestAnimationFrame(tick);
-    else if (state === "reduced") {
-      bursts = [];
-      trail = [];
-      pointer.active = false;
-      pointer.strength = 0;
-      down = null;
-      draw(performance.now() / 1000);
-    }
   }
   function scroll() {
     dirty = true;
     down = null;
-    if (media.matches && !document.hidden && !raf)
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        if (!disposed) draw(performance.now() / 1000);
-      });
   }
   function move(e: PointerEvent) {
     if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10)
       down.moved = true;
-    if (e.pointerType === "touch" || media.matches) return;
+    if (e.pointerType === "touch") return;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
     pointer.active = true;
@@ -626,7 +593,6 @@ export function createSvgBackground(
       down?.id === e.pointerId &&
       !down.moved &&
       !excluded(e) &&
-      !media.matches &&
       (getSelection()?.isCollapsed ?? true) &&
       performance.now() - down.at < 550
     ) {
@@ -664,20 +630,14 @@ export function createSvgBackground(
     }
     sync();
   }
-  function motionChange() {
-    firstRow = NaN;
-    dirty = true;
-    sync();
-  }
   const regionsObserver = new IntersectionObserver(
     (entries) => {
+      if (disposed) return;
       for (const e of entries) {
         if (e.isIntersecting) visibleRegions.add(e.target);
         else visibleRegions.delete(e.target);
       }
       dirty = true;
-      if (media.matches && !document.hidden && !disposed)
-        draw(performance.now() / 1000);
     },
     { rootMargin: "80px" },
   );
@@ -702,7 +662,6 @@ export function createSvgBackground(
   window.addEventListener("scroll", scroll, { passive: true });
   window.addEventListener("resize", measure, { passive: true });
   document.addEventListener("visibilitychange", visibility);
-  media.addEventListener("change", motionChange);
   measure();
   sync();
   document.fonts.ready.then(() => {
@@ -726,6 +685,19 @@ export function createSvgBackground(
     window.removeEventListener("scroll", scroll);
     window.removeEventListener("resize", measure);
     document.removeEventListener("visibilitychange", visibility);
-    media.removeEventListener("change", motionChange);
+    bursts = [];
+    trail = [];
+    down = null;
+    svg.style.opacity = "0";
+    feedback.style.opacity = "0";
+    for (const el of [
+      ...objects,
+      ...routes.map((route) => route.el),
+      ...reactive.map((item) => item.el),
+      ...effects.flatMap((effect) => [effect.el, ...effect.sparks]),
+      halo,
+      trailGroup,
+    ])
+      attr(el, "visibility", "hidden");
   };
 }

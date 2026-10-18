@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { Studio } from "./studio";
 import { ThemePicker } from "./theme-picker";
+import { AnimationToggle } from "./animation-toggle";
 import { SiteBackground } from "./site-background";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 export const repo = "https://github.com/openloadbalancer/olb";
@@ -53,6 +54,7 @@ function Header() {
         </nav>
         <div className="header-actions">
           <ThemePicker />
+          <AnimationToggle />
           <a
             className="github-link"
             href={repo}

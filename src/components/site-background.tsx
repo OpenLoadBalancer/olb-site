@@ -2,22 +2,26 @@
 
 import { memo, useEffect, useId, useRef } from "react";
 import { BACKGROUND, createSvgBackground } from "./svg-background-scene";
+import { useBackgroundMotion } from "./background-motion";
 
 /** Two shared viewport layers: quiet ambient art and unmasked pointer feedback. */
 export const SiteBackground = memo(function SiteBackground() {
   const ref = useRef<SVGSVGElement>(null);
   const feedback = useRef<SVGSVGElement>(null);
   const id = useId().replaceAll(":", "");
+  const mode = useBackgroundMotion();
   useEffect(() => {
     const svg = ref.current;
-    if (svg?.parentElement && feedback.current)
+    if (mode === "enabled" && svg?.parentElement && feedback.current)
       return createSvgBackground(svg, feedback.current, svg.parentElement);
-  }, []);
+  }, [mode]);
+  const state = mode === "enabled" ? "running" : mode;
   return (
     <>
       <svg
         ref={ref}
         className="site-background"
+        data-motion={state}
         viewBox="0 0 1440 1000"
         aria-hidden="true"
         focusable="false"
@@ -83,6 +87,7 @@ export const SiteBackground = memo(function SiteBackground() {
       <svg
         ref={feedback}
         className="site-interactions"
+        data-motion={state}
         viewBox="0 0 1440 1000"
         aria-hidden="true"
         focusable="false"

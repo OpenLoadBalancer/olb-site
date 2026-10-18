@@ -285,6 +285,62 @@ p code {
   align-items: center;
   gap: 20px;
 }
+.motion-control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.motion-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--accent);
+}
+.motion-toggle[aria-pressed="false"] {
+  color: var(--muted);
+  background: transparent;
+}
+.motion-toggle[aria-pressed="false"] svg {
+  opacity: 0.6;
+}
+.motion-toggle:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+.motion-tooltip {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 6;
+  padding: 8px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px #0002;
+}
+@media (max-width: 360px) {
+  .header .header-inner,
+  .header .header-actions {
+    gap: 6px;
+  }
+  .header .brand {
+    font-size: 12px;
+    gap: 6px;
+  }
+  .header .brand img {
+    width: 24px;
+    height: 24px;
+  }
+}
 .github-link {
   display: flex;
   gap: 9px;
@@ -328,6 +384,10 @@ p code {
 }
 .site-interactions {
   z-index: 30;
+}
+.site-background:not([data-motion="running"]):not([data-motion="paused"]),
+.site-interactions:not([data-motion="running"]):not([data-motion="paused"]) {
+  visibility: hidden;
 }
 .interaction-objects {
   opacity: 0.42;
