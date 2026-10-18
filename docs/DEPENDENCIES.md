@@ -14,6 +14,8 @@ Verified on **2026-10-18**, using the official npm registry `latest` dist-tags, 
 | React / React DOM types | 19.3.0         | https://registry.npmjs.org/@types/react/latest and https://registry.npmjs.org/@types/react-dom/latest |
 | Sharp                   | 0.35.5         | https://registry.npmjs.org/sharp/latest                                                               |
 | Prettier                | 3.9.10         | https://registry.npmjs.org/prettier/latest                                                            |
+| Lucide React            | 1.59.0         | https://registry.npmjs.org/lucide-react/latest                                                        |
+| Manrope variable font   | 5.3.0          | https://registry.npmjs.org/@fontsource-variable/manrope/latest                                        |
 
 Node's official Windows binary was checked against the published SHA256SUMS before local installation in ignored task storage. Local install, typechecking, build, export, and browser tests run under this Node and npm pair. `engine-strict=true` prevents accidental installs with a different toolchain.
 

@@ -18,6 +18,7 @@
   --gutter: clamp(22px, 4.3vw, 92px);
   --section: clamp(76px, 7.5vw, 142px);
   --max: 1720px;
+  --header-height: 88px;
   --oxog-pink: #ed0878;
   --oxog-purple: #a35adb;
   color-scheme: dark;
@@ -244,7 +245,7 @@ p code {
   align-items: center;
   justify-content: space-between;
   gap: 30px;
-  height: 88px;
+  height: var(--header-height);
 }
 .brand {
   display: inline-flex;
@@ -301,85 +302,6 @@ p code {
 .mobile-toggle {
   display: none;
   font-size: 21px;
-}
-.theme-picker {
-  position: relative;
-}
-.theme-popover {
-  position: absolute;
-  right: 0;
-  top: 46px;
-  width: 320px;
-  padding: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  box-shadow: 0 15px 50px #0004;
-  margin: 0;
-  z-index: 30;
-}
-.theme-popover legend {
-  float: left;
-  font-size: 14px;
-  font-weight: 600;
-  width: 100%;
-  margin-bottom: 5px;
-}
-.theme-popover p {
-  font-size: 12px;
-  clear: both;
-  margin-bottom: 15px;
-}
-.theme-choices {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-.theme-choices label {
-  position: relative;
-  cursor: pointer;
-  font-size: 12px;
-}
-.theme-choices input {
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  accent-color: var(--accent);
-}
-.theme-preview {
-  height: 57px;
-  border: 2px solid var(--border);
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  margin-bottom: 8px;
-}
-.theme-choices input:checked + .theme-preview {
-  border-color: var(--accent);
-}
-.theme-choices input:focus-visible + .theme-preview {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-.theme-preview i {
-  display: block;
-  height: 3px;
-  background: #9ba29b;
-  width: 65%;
-}
-.theme-preview i:nth-child(2) {
-  width: 90%;
-}
-.preview-light {
-  background: #f6f5ef;
-}
-.preview-dark {
-  background: #111312;
-}
-.preview-system {
-  background: linear-gradient(90deg, #f6f5ef 50%, #111312 50%);
 }
 .hero {
   display: grid;
@@ -1419,8 +1341,8 @@ pre {
   .release-pill {
     font-size: 11px;
   }
-  .header-inner {
-    height: 100px;
+  :root {
+    --header-height: 100px;
   }
   .feature-grid article {
     padding: 45px;
@@ -1573,8 +1495,8 @@ pre {
     --gutter: 28px;
     --section: 75px;
   }
-  .header-inner {
-    height: 74px;
+  :root {
+    --header-height: 74px;
   }
   .navigation {
     gap: 17px;
@@ -1794,9 +1716,10 @@ pre {
   :root {
     --gutter: 22px;
     --section: 65px;
+    --header-height: 70px;
   }
   .header-inner {
-    height: 70px;
+    height: var(--header-height);
     gap: 10px;
   }
   .brand {
@@ -1818,7 +1741,7 @@ pre {
   .navigation {
     display: none;
     position: absolute;
-    top: 70px;
+    top: var(--header-height);
     left: 0;
     width: 100%;
     padding: 18px var(--gutter) 25px;
@@ -1840,11 +1763,7 @@ pre {
     width: 32px;
     height: 32px;
   }
-  .theme-popover {
-    right: -42px;
-    width: min(305px, calc(100vw - 36px));
-    padding: 17px;
-  }
+
   .hero {
     padding-top: 48px;
     gap: 35px;

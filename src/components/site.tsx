@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { Studio } from "./studio";
+import { ThemePicker } from "./theme-picker";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 export const repo = "https://github.com/openloadbalancer/olb";
 export const docs = `${repo}/blob/main/docs`;
@@ -28,113 +29,6 @@ export function Logo() {
         Open<span className="brand-light">LoadBalancer</span>
       </span>
     </a>
-  );
-}
-export function ThemePicker() {
-  const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState("system");
-  const ref = useRef<HTMLDivElement>(null);
-  const button = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const refresh = () => {
-      try {
-        const value = localStorage.getItem("olb-theme") || "system";
-        setTheme(
-          ["light", "dark", "system"].includes(value) ? value : "system",
-        );
-      } catch {}
-    };
-    refresh();
-    const close = (event: PointerEvent) => {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", close);
-    const blur = (event: FocusEvent) => {
-      if (!ref.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("focusin", blur);
-    window.addEventListener("storage", refresh);
-    return () => {
-      document.removeEventListener("pointerdown", close);
-      document.removeEventListener("focusin", blur);
-      window.removeEventListener("storage", refresh);
-    };
-  }, []);
-  useEffect(() => {
-    if (open)
-      ref.current?.querySelector<HTMLInputElement>("input:checked")?.focus();
-  }, [open]);
-  function choose(value: string) {
-    setTheme(value);
-    try {
-      localStorage.setItem("olb-theme", value);
-    } catch {}
-    document.documentElement.dataset.preference = value;
-    document.documentElement.dataset.theme =
-      value === "system"
-        ? matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-        : value;
-  }
-  return (
-    <div
-      className="theme-picker"
-      ref={ref}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          setOpen(false);
-          button.current?.focus();
-        }
-      }}
-    >
-      <button
-        ref={button}
-        className="icon-button"
-        aria-label="Choose theme"
-        aria-expanded={open}
-        aria-controls="theme-options"
-        onClick={() => setOpen(!open)}
-      >
-        <svg
-          width="19"
-          height="19"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
-        </svg>
-      </button>
-      {open && (
-        <fieldset id="theme-options" className="theme-popover">
-          <legend>Appearance</legend>
-          <p>A little more you.</p>
-          <div className="theme-choices">
-            {["light", "dark", "system"].map((value) => (
-              <label key={value}>
-                <input
-                  type="radio"
-                  name="theme"
-                  value={value}
-                  checked={theme === value}
-                  onChange={() => choose(value)}
-                />
-                <span className={`theme-preview preview-${value}`}>
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <span>{value[0].toUpperCase() + value.slice(1)}</span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      )}
-    </div>
   );
 }
 function Header() {

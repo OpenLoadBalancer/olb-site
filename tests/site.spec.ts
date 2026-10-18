@@ -38,6 +38,29 @@ for (const theme of ["light", "dark"])
           fullPage: true,
         });
       }
+      await page.goto("/");
+      await page.getByRole("button", { name: /^Color theme:/ }).click();
+      const panel = page.getByRole("dialog", { name: "Appearance" });
+      await expect(panel).toBeVisible();
+      await expect(
+        panel.getByRole("radio", {
+          name: theme === "light" ? "Light" : "Dark",
+          exact: true,
+        }),
+      ).toBeFocused();
+      await page.evaluate(() => document.fonts.ready);
+      const bounds = await panel.boundingBox();
+      expect(bounds!.x).toBeGreaterThanOrEqual(0);
+      expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+      expect(bounds!.y).toBeGreaterThanOrEqual(
+        await page
+          .locator(".theme-trigger")
+          .evaluate((el) => el.getBoundingClientRect().bottom),
+      );
+      if (width > 680) expect(bounds!.width).toBe(328);
+      await page.screenshot({
+        path: `test-results/screenshots/theme-menu-${theme}-${width}.png`,
+      });
       expect(errors).toEqual([]);
     });
   }
@@ -47,21 +70,94 @@ test("theme persists, follows system, and closes with Escape", async ({
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByRole("button", { name: "Choose theme" }).click();
+  await page.getByRole("button", { name: /^Color theme:/ }).click();
   await page.getByRole("radio", { name: "Light", exact: true }).check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.getByRole("radio", { name: "Light", exact: true }).press("Escape");
   await expect(
-    page.getByRole("button", { name: "Choose theme" }),
+    page.getByRole("button", { name: /^Color theme:/ }),
   ).toBeFocused();
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await page.getByRole("button", { name: "Choose theme" }).click();
+  await page.getByRole("button", { name: /^Color theme:/ }).click();
   await page.getByRole("radio", { name: "System", exact: true }).check();
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+test("Cobalt-style appearance dialog supports radio keys and outside dismissal", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const trigger = page.getByRole("button", {
+    name: "Color theme: System",
+    exact: true,
+  });
+  await trigger.click();
+  const panel = page.getByRole("dialog", { name: "Appearance" });
+  await expect(
+    panel.getByRole("radio", { name: "System", exact: true }),
+  ).toBeFocused();
+  await panel
+    .getByRole("radio", { name: "System", exact: true })
+    .press("ArrowLeft");
+  await expect(
+    page.getByRole("button", { name: "Color theme: Dark", exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("radio", { name: "Dark", exact: true }),
+  ).toBeChecked();
+  await expect(
+    panel.getByText("Dark mode, just how you like it."),
+  ).toBeVisible();
+  await page.getByRole("heading", { level: 1 }).click();
+  await expect(panel).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Color theme: Dark", exact: true })
+    .click();
+  await panel.getByRole("radio", { name: "Dark", exact: true }).press("Escape");
+  await expect(
+    page.getByRole("button", { name: "Color theme: Dark", exact: true }),
+  ).toBeFocused();
+});
+test("theme trigger stays synchronized across tabs and storage clearing", async ({
+  page,
+  context,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  const other = await context.newPage();
+  await other.goto("/");
+  await page.getByRole("button", { name: /^Color theme:/ }).click();
+  await page.getByRole("radio", { name: "Dark", exact: true }).check();
+  await expect(
+    other.getByRole("button", { name: "Color theme: Dark", exact: true }),
+  ).toBeVisible();
+  await expect(other.locator("html")).toHaveAttribute("data-theme", "dark");
+  await other.evaluate(() => localStorage.clear());
+  await expect(
+    page.getByRole("button", { name: "Color theme: System", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});
+test("theme selection works when persistent storage is unavailable", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(window, "localStorage", {
+      get() {
+        throw new Error("storage unavailable");
+      },
+    }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: /^Color theme:/ }).click();
+  await page.getByRole("radio", { name: "Light", exact: true }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(
+    page.getByRole("button", { name: "Color theme: Light", exact: true }),
+  ).toBeVisible();
 });
 test("traffic explorer updates algorithm and failover state", async ({
   page,
