@@ -9,7 +9,20 @@ export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
 export function Logo() {
   return (
     <a className="brand" href="/" aria-label="OpenLoadBalancer home">
-      <img src="/brand/mark.svg" width="36" height="36" alt="" />
+      <img
+        className="brand-mark-primary"
+        src="/brand/mark.svg"
+        width="36"
+        height="36"
+        alt=""
+      />
+      <img
+        className="brand-mark-dark"
+        src="/brand/mark-on-dark.svg"
+        width="36"
+        height="36"
+        alt=""
+      />
       <span>
         Open<span className="brand-light">LoadBalancer</span>
       </span>

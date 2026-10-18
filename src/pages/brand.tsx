@@ -10,13 +10,13 @@ export default function Brand() {
         <section className="doc-hero">
           <div className="eyebrow accent">OPENLOADBALANCER / BRAND</div>
           <h1>
-            Meet your
+            One entry.
             <br />
-            traffic controller.
+            Every direction.
           </h1>
           <p>
-            A friendly face for serious infrastructure. Our traffic-controller
-            gopher brings an open-source spirit to every route.
+            A single connection becomes a balanced flow. Our blue routing mark
+            puts OpenLoadBalancer's purpose at the center of its identity.
           </p>
         </section>
         <div className="docs-layout">
@@ -34,21 +34,28 @@ export default function Brand() {
             <a href="/brand/mark-mono-light.svg" download>
               Download light mono SVG
             </a>
+            <a href="/brand/logo-light.svg" download>
+              Download stacked SVG logo
+            </a>
+            <a href="/brand/logo-light.png" download>
+              Download stacked PNG logo
+            </a>
           </aside>
           <article className="docs-content">
-            <h2>A clear path. A character of its own.</h2>
+            <h2>A clear path in every direction.</h2>
             <p>
-              The turquoise gopher and orange hard hat celebrate the project's
-              traffic-controller mascot. A three-way route on the helmet turns
-              one incoming connection into a balanced flow. Clean shapes and a
-              strong outline keep the mark recognizable at small sizes.
+              Five outward arrows grow from one shared entry point. The central
+              trunk represents a single listener; the branches express traffic
+              distribution. An open network enclosure frames the flow. The
+              symbol, horizontal wordmark, and stacked OLB lockup share the same
+              editable vector geometry.
             </p>
             <img
               className="brand-reference"
               src="/brand/preview.png"
               width="1200"
               height="640"
-              alt="Original traffic-controller gopher logo on dark and light backgrounds, with small-size examples"
+              alt="Blue five-way routing logo on dark and light backgrounds, with small-size examples"
             />
             <div className="brand-grid">
               <div className="brand-tile">
@@ -76,12 +83,12 @@ export default function Brand() {
             </div>
             <h2>Source & attribution</h2>
             <p>
-              This logo is original SVG artwork created for OpenLoadBalancer,
-              inspired by the project's illustrated traffic-controller gopher.
-              Its geometry is shared across the favicon, transparent PNG,
-              monochrome marks, and wordmarks. Geist is designed by Vercel and
-              distributed under the SIL Open Font License. The Oxog footer mark
-              and drawing animation are adapted from{" "}
+              This SVG logo was reconstructed from the routing-logo reference
+              supplied by the project owner. Its geometry is shared across the
+              favicon, transparent PNG, monochrome marks, and wordmarks. Geist
+              is designed by Vercel and distributed under the SIL Open Font
+              License. The Oxog footer mark and drawing animation are adapted
+              from{" "}
               <a href="https://github.com/cobaltdb/cobaltdb-site">
                 the CobaltDB site
               </a>{" "}

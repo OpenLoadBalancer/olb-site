@@ -2316,3 +2316,12 @@ pre {
   border-radius: 8px;
   margin-block: 30px;
 }
+.brand .brand-mark-dark {
+  display: none;
+}
+:root[data-theme="dark"] .brand .brand-mark-primary {
+  display: none;
+}
+:root[data-theme="dark"] .brand .brand-mark-dark {
+  display: block;
+}
