@@ -117,9 +117,12 @@ test("installation tabs and copy buttons deliver the displayed code", async ({
   await page
     .getByRole("button", { name: "Copy Homebrew", exact: true })
     .click();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-    "brew tap openloadbalancer/olb\nbrew install olb",
-  );
+  expect(
+    (await page.evaluate(() => navigator.clipboard.readText())).replaceAll(
+      "\r\n",
+      "\n",
+    ),
+  ).toBe("brew tap openloadbalancer/olb\nbrew install olb");
 });
 test("denied clipboard provides a visible recovery instruction", async ({
   page,
