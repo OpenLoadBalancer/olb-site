@@ -1,0 +1,88 @@
+"use client";
+
+import { memo, useEffect, useId, useRef } from "react";
+import { BACKGROUND, createSvgBackground } from "./svg-background-scene";
+
+/** One viewport-sized SVG serves the entire document. React never renders frames. */
+export const SiteBackground = memo(function SiteBackground() {
+  const ref = useRef<SVGSVGElement>(null);
+  const id = useId().replaceAll(":", "");
+  useEffect(() => {
+    const svg = ref.current;
+    if (svg?.parentElement) return createSvgBackground(svg, svg.parentElement);
+  }, []);
+  return (
+    <svg
+      ref={ref}
+      className="site-background"
+      viewBox="0 0 1440 1000"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <g id={`${id}-fork`}>
+          <path d="M-20 0H-7Q2 0 7-9L17-21M-7 0Q2 0 7 9L17 21M-7 0H22M13-21h5v5M13 21h5v-5M17-5l5 5-5 5" />
+        </g>
+        <g id={`${id}-hex`}>
+          <path d="m0-20 17 10v20L0 20-17 10v-20Zm0 7 11 6v14L0 13-11 7V-7ZM0-20v7M17 10l-6-3M-17 10l6-3" />
+        </g>
+        <g id={`${id}-node`}>
+          <rect x="-17" y="-13" width="34" height="26" rx="5" />
+          <path d="M-10-5H4M-10 3H4M10-5h.1M10 3h.1M-23 0h6M17 0h6M0-19v6M0 13v6" />
+        </g>
+        <g id={`${id}-orbit`}>
+          <circle r="17" />
+          <path d="M-23 0H23M0-23V23" />
+          <circle r="5" />
+        </g>
+        <g id={`${id}-diamond`}>
+          <path d="m0-20 20 20L0 20-20 0Zm0 11 9 9-9 9-9-9ZM-28 0h4M24 0h4" />
+        </g>
+        <linearGradient id={`${id}-edge`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="black" />
+          <stop offset=".065" stopColor="white" />
+          <stop offset=".935" stopColor="white" />
+          <stop offset="1" stopColor="black" />
+        </linearGradient>
+        <mask id={`${id}-mask`}>
+          <rect width="100%" height="100%" fill={`url(#${id}-edge)`} />
+        </mask>
+      </defs>
+      <g
+        mask={`url(#${id}-mask)`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <g className="background-wires">
+          {Array.from({ length: BACKGROUND.maxRows }, (_, i) => (
+            <g key={i} data-route="" visibility="hidden">
+              <path data-wire="" />
+              <path data-packet="" pathLength="1000" strokeDasharray="4 996" />
+            </g>
+          ))}
+        </g>
+        <g className="background-objects">
+          {Array.from({ length: BACKGROUND.maxObjects }, (_, i) => (
+            <g key={i} data-object="" visibility="hidden">
+              <use href={`#${id}-fork`} data-glyph-prefix={id} />
+            </g>
+          ))}
+        </g>
+        <g className="background-effects">
+          {Array.from({ length: BACKGROUND.maxBursts }, (_, i) => (
+            <g key={i} data-burst="" visibility="hidden">
+              <circle data-ring="" r="0" />
+              <circle data-echo="" r="0" strokeDasharray="3 8" />
+              {Array.from({ length: BACKGROUND.rays }, (_, n) => (
+                <path key={n} data-spark="" d="M-7 0H0m-3-3 3 3-3 3" />
+              ))}
+            </g>
+          ))}
+        </g>
+      </g>
+    </svg>
+  );
+});

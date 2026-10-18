@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { Studio } from "./studio";
 import { ThemePicker } from "./theme-picker";
+import { SiteBackground } from "./site-background";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 export const repo = "https://github.com/openloadbalancer/olb";
 export const docs = `${repo}/blob/main/docs`;
@@ -211,12 +212,15 @@ export function Site({
           content="OpenLoadBalancer — Your traffic. Your rules."
         />
       </Head>
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <Header />
-      <main id="main">{children}</main>
-      <Footer />
+      <div className="site-shell">
+        <SiteBackground />
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <Header />
+        <main id="main">{children}</main>
+        <Footer />
+      </div>
     </>
   );
 }

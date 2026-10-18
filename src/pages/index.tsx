@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Site, Code, SectionTitle, Arrow, repo, docs } from "@/components/site";
 import { TrafficDiagram, ArchitectureDiagram } from "@/components/traffic";
 import { sampleConfig } from "@/content";
-import { HeroBackground } from "@/components/hero-background";
 const installs = {
   "Linux / macOS": "curl -fsSL https://openloadbalancer.dev/install.sh | sh",
   Windows: "irm https://openloadbalancer.dev/install.ps1 | iex",
@@ -16,7 +15,6 @@ export default function Home() {
   return (
     <Site>
       <section className="hero-stage">
-        <HeroBackground />
         <div className="hero container">
           <div className="hero-copy">
             <a href={`${repo}/releases`} className="release-pill">
