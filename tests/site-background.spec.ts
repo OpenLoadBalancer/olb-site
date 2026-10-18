@@ -39,7 +39,8 @@ async function setup(page: Page, path = "/") {
   });
   await page.goto(path);
   await expect(svg(page)).toHaveAttribute("data-motion", /running|reduced/);
-  await page.clock.pauseAt(new Date("2026-10-18T12:00:05Z"));
+  // Keep the pause target beyond the entire test timeout, including slow loads.
+  await page.clock.pauseAt(new Date("2026-10-18T12:01:00Z"));
   await page.clock.runFor(1200);
 }
 const updates = (page: Page) =>
