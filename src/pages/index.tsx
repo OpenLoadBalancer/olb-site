@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Site, Code, SectionTitle, Arrow, repo, docs } from "@/components/site";
 import { TrafficDiagram, ArchitectureDiagram } from "@/components/traffic";
 import { sampleConfig } from "@/content";
+import { HeroBackground } from "@/components/hero-background";
 const installs = {
   "Linux / macOS": "curl -fsSL https://openloadbalancer.dev/install.sh | sh",
   Windows: "irm https://openloadbalancer.dev/install.ps1 | iex",
@@ -14,54 +15,57 @@ export default function Home() {
     useState<keyof typeof installs>("Linux / macOS");
   return (
     <Site>
-      <section className="hero container">
-        <div className="hero-copy">
-          <a href={`${repo}/releases`} className="release-pill">
-            <span className="status-dot" /> BUILT IN GO. OPEN BY DESIGN.{" "}
-            <Arrow />
-          </a>
-          <h1>
-            Your traffic.
-            <br />
-            Your{" "}
-            <span className="accent-word">
-              rules.
-              <svg viewBox="0 0 380 20" aria-hidden="true">
-                <path d="M3 13Q168-5 376 10M30 18Q180 5 330 14" />
-              </svg>
-            </span>
-          </h1>
-          <p className="hero-description">
-            The clear path between your users
-            <br className="desktop-break" /> and your infrastructure.
-          </p>
-          <p className="hero-detail">
-            Route, protect, and observe your traffic with a minimal-dependency
-            L4/L7 load balancer. One Go binary. Full control.
-          </p>
-          <div className="hero-buttons">
-            <a className="button primary" href="#quick-start">
-              Get started <Arrow />
+      <section className="hero-stage">
+        <HeroBackground />
+        <div className="hero container">
+          <div className="hero-copy">
+            <a href={`${repo}/releases`} className="release-pill">
+              <span className="status-dot" /> BUILT IN GO. OPEN BY DESIGN.{" "}
+              <Arrow />
             </a>
-            <a className="button secondary" href={repo}>
-              Explore on GitHub <Arrow diagonal />
-            </a>
+            <h1>
+              Your traffic.
+              <br />
+              Your{" "}
+              <span className="accent-word">
+                rules.
+                <svg viewBox="0 0 380 20" aria-hidden="true">
+                  <path d="M3 13Q168-5 376 10M30 18Q180 5 330 14" />
+                </svg>
+              </span>
+            </h1>
+            <p className="hero-description">
+              The clear path between your users
+              <br className="desktop-break" /> and your infrastructure.
+            </p>
+            <p className="hero-detail">
+              Route, protect, and observe your traffic with a minimal-dependency
+              L4/L7 load balancer. One Go binary. Full control.
+            </p>
+            <div className="hero-buttons">
+              <a className="button primary" href="#quick-start">
+                Get started <Arrow />
+              </a>
+              <a className="button secondary" href={repo}>
+                Explore on GitHub <Arrow diagonal />
+              </a>
+            </div>
+            <div className="hero-footnote">
+              <span>HTTP / HTTPS</span>
+              <i /> <span>TCP / UDP</span>
+              <i />
+              <span>APACHE 2.0</span>
+            </div>
           </div>
-          <div className="hero-footnote">
-            <span>HTTP / HTTPS</span>
-            <i /> <span>TCP / UDP</span>
-            <i />
-            <span>APACHE 2.0</span>
-          </div>
-        </div>
-        <div className="hero-visual">
-          <div className="visual-corner">REQUEST IN. POSSIBILITY OUT.</div>
-          <TrafficDiagram />
-          <div className="visual-foot">
-            <span>YOUR INFRASTRUCTURE, CONNECTED.</span>
-            <span>
-              01 — 03 <span className="accent">●</span>
-            </span>
+          <div className="hero-visual">
+            <div className="visual-corner">REQUEST IN. POSSIBILITY OUT.</div>
+            <TrafficDiagram />
+            <div className="visual-foot">
+              <span>YOUR INFRASTRUCTURE, CONNECTED.</span>
+              <span>
+                01 — 03 <span className="accent">●</span>
+              </span>
+            </div>
           </div>
         </div>
       </section>
