@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
+import sharp from "sharp";
 const root = path.resolve("out");
+const social = await sharp(path.join(root, "og.png")).metadata();
+assert.equal(social.format, "png");
+assert.equal(social.width, 1200);
+assert.equal(social.height, 630);
+assert.deepEqual(await readFile("out/og.png"), await readFile("public/og.png"));
+console.log("PASS Open Graph PNG: 1200×630, exported bytes match source");
 const routes = [
   "index.html",
   "docs/index.html",
