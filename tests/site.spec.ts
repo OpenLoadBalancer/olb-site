@@ -113,6 +113,13 @@ test("installation tabs and copy buttons deliver the displayed code", async ({
   await expect(
     page.getByRole("button", { name: "Copy Install · Docker", exact: true }),
   ).toBeVisible();
+  await page.goto("/docs/");
+  await page
+    .getByRole("button", { name: "Copy Homebrew", exact: true })
+    .click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    "brew tap openloadbalancer/olb\nbrew install olb",
+  );
 });
 test("denied clipboard provides a visible recovery instruction", async ({
   page,

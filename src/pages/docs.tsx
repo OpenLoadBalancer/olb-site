@@ -49,7 +49,7 @@ export default function Documentation() {
             </p>
             <Code
               label="Homebrew"
-              code="brew tap openloadbalancer/olb\nbrew install olb"
+              code={"brew tap openloadbalancer/olb\nbrew install olb"}
             />
             <h2 id="configure">02. Define a backend pool</h2>
             <p>
