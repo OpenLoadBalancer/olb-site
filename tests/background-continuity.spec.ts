@@ -198,3 +198,125 @@ test("overlaid feedback preserves text selection and control clicks, and motion 
     0,
   );
 });
+
+test("hover follows a smooth curved path while the pointer is stationary", async ({
+  page,
+}) => {
+  await ready(page, "dark");
+  const nodes = page.locator(".site-background [data-object]");
+  const anchor = await nodes.evaluateAll((els) =>
+    els
+      .map((el, index) => {
+        const m = (el as SVGGraphicsElement).getCTM()!;
+        return {
+          index,
+          x: m.e,
+          y: m.f,
+          visible: el.getAttribute("visibility") === "visible",
+        };
+      })
+      .find(
+        (p) => p.visible && p.x > 250 && p.x < 800 && p.y > 250 && p.y < 700,
+      )!,
+  );
+  const node = nodes.nth(anchor.index);
+  const pose = () =>
+    node.evaluate((el) => {
+      const m = (el as SVGGraphicsElement).getCTM()!;
+      return { x: m.e, y: m.f, turn: (Math.atan2(m.b, m.a) * 180) / Math.PI };
+    });
+  await page.mouse.move(anchor.x - 90, anchor.y);
+  const samples = [await pose()];
+  for (let i = 0; i < 24; i++) {
+    await page.clock.runFor(100);
+    samples.push(await pose());
+  }
+  // A held pointer produces lateral circulation, not just a radial shove.
+  expect(
+    Math.max(...samples.map((p) => p.y)) - Math.min(...samples.map((p) => p.y)),
+  ).toBeGreaterThan(12);
+  expect(
+    Math.max(...samples.map((p) => p.turn)) -
+      Math.min(...samples.map((p) => p.turn)),
+  ).toBeGreaterThan(8);
+  for (let i = 1; i < samples.length; i++) {
+    expect(
+      Math.hypot(
+        samples[i].x - samples[i - 1].x,
+        samples[i].y - samples[i - 1].y,
+      ),
+    ).toBeLessThan(35);
+    expect(
+      Math.hypot(samples[i].x - anchor.x, samples[i].y - anchor.y),
+    ).toBeLessThan(150);
+  }
+});
+
+test("one click relays delayed pulses between neighbouring shapes and the cascade ends", async ({
+  page,
+}) => {
+  await ready(page);
+  const fx = page.locator(".site-interactions");
+  const count = await fx.locator("*").count();
+  const origin = await page
+    .locator('.site-background [data-object][visibility="visible"]')
+    .evaluateAll(
+      (els) =>
+        els
+          .map((el) => {
+            const m = (el as SVGGraphicsElement).getCTM()!;
+            return { x: m.e, y: m.f };
+          })
+          .filter((p) => p.x > 100 && p.x < 650 && p.y > 150 && p.y < 800)
+          .sort(
+            (a, b) =>
+              Math.hypot(a.x - 300, a.y - 450) -
+              Math.hypot(b.x - 300, b.y - 450),
+          )[0],
+    );
+  const init = {
+    clientX: origin.x,
+    clientY: origin.y,
+    button: 0,
+    pointerId: 92,
+    isPrimary: true,
+    pointerType: "mouse",
+  };
+  await page.locator(".site-shell").dispatchEvent("pointerdown", init);
+  await page.locator(".site-shell").dispatchEvent("pointerup", init);
+  const starts = new Map<number, { at: number; x: number; y: number }>();
+  for (let at = 100; at <= 2000; at += 100) {
+    await page.clock.runFor(100);
+    const pulses = await fx.locator("[data-reactive]").evaluateAll((els) =>
+      els.flatMap((el, index) => {
+        const ring = el.querySelector("[data-resonance]");
+        if (
+          !ring ||
+          el.getAttribute("visibility") !== "visible" ||
+          Number(ring.getAttribute("opacity")) < 0.04
+        )
+          return [];
+        const m = (el as SVGGraphicsElement).getCTM()!;
+        return [{ index, x: m.e, y: m.f }];
+      }),
+    );
+    for (const p of pulses)
+      if (!starts.has(p.index)) starts.set(p.index, { at, x: p.x, y: p.y });
+    expect(pulses.length).toBeLessThanOrEqual(8);
+  }
+  expect(starts.size).toBeGreaterThanOrEqual(3);
+  const timings = [...starts.values()];
+  expect(
+    Math.max(...timings.map((p) => p.at)) -
+      Math.min(...timings.map((p) => p.at)),
+  ).toBeGreaterThanOrEqual(300);
+  expect(
+    timings.some((p) => Math.hypot(p.x - origin.x, p.y - origin.y) > 340),
+  ).toBe(true);
+  await page.clock.runFor(700);
+  await expect(fx.locator('[data-reactive][visibility="visible"]')).toHaveCount(
+    0,
+  );
+  await expect(fx.locator('[data-burst][visibility="visible"]')).toHaveCount(0);
+  expect(await fx.locator("*").count()).toBe(count);
+});

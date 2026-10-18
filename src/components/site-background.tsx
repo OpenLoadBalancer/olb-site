@@ -113,6 +113,7 @@ export const SiteBackground = memo(function SiteBackground() {
             {Array.from({ length: BACKGROUND.maxObjects }, (_, i) => (
               <g key={i} data-reactive="" visibility="hidden">
                 <path data-tether="" />
+                <circle data-resonance="" r="22" opacity="0" />
                 <use href={`#${id}-fork`} data-glyph-prefix={id} />
               </g>
             ))}

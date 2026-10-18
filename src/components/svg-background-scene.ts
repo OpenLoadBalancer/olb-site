@@ -13,6 +13,9 @@ export const BACKGROUND = {
   drift: 9,
   force: 76,
   forceCore: 64,
+  spring: 7,
+  relayLife: 0.6,
+  relayLimit: 8,
   burstLife: 2,
   burstRadius: 340,
   trailLife: 0.75,
@@ -25,8 +28,22 @@ export const BACKGROUND = {
 
 type Point = { x: number; y: number };
 type Region = { left: number; top: number; right: number; bottom: number };
-type Shape = Point & { seed: number; depth: number; type: number };
-type Burst = Point & { born: number; variant: number; power: number };
+type Shape = Point & {
+  seed: number;
+  depth: number;
+  type: number;
+  offset: Point;
+  velocity: Point;
+  turn: number;
+  spin: number;
+};
+type Relay = { seed: number; arrival: number; power: number; angle: number };
+type Burst = Point & {
+  born: number;
+  variant: number;
+  power: number;
+  relays: Relay[];
+};
 const clamp = (v: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
 const ease = (v: number) => {
   v = clamp(v);
@@ -61,6 +78,7 @@ export function createSvgBackground(
     el,
     glyph: el.querySelector("use")!,
     tether: el.querySelector("path")!,
+    resonance: el.querySelector("[data-resonance]")!,
   }));
   const halo = feedback.querySelector("[data-pointer]")!;
   const haloRing = halo.querySelector(".pointer-ring")!;
@@ -125,6 +143,7 @@ export function createSvgBackground(
     if (row === firstRow) return;
     firstRow = row;
     const names = ["fork", "hex", "node", "orbit", "diamond"];
+    const previous = new Map(shapes.map((shape) => [shape.seed, shape]));
     shapes = [];
     for (let r = 0; r < rows; r++)
       for (let c = 0; c < columns; c++) {
@@ -136,6 +155,10 @@ export function createSvgBackground(
           seed,
           depth: 0.45 + random(seed + 2) * 0.55,
           type,
+          offset: previous.get(seed)?.offset ?? { x: 0, y: 0 },
+          velocity: previous.get(seed)?.velocity ?? { x: 0, y: 0 },
+          turn: previous.get(seed)?.turn ?? 0,
+          spin: previous.get(seed)?.spin ?? 0,
         });
         const i = shapes.length - 1;
         attr(
@@ -181,7 +204,78 @@ export function createSvgBackground(
     dirty = true;
     draw(performance.now() / 1000);
   }
-  function draw(now: number) {
+  // Plan a small, acyclic neighbour cascade once per click, never per frame.
+  function relay(p: Point): Relay[] {
+    const candidates = shapes
+      .map((s) => ({
+        seed: s.seed,
+        x: s.x + s.offset.x,
+        y: s.y - origin + s.offset.y,
+      }))
+      .filter((s) => s.y > 0 && s.y < height);
+    const nearest = candidates.reduce<(typeof candidates)[number] | undefined>(
+      (best, s) =>
+        !best ||
+        Math.hypot(s.x - p.x, s.y - p.y) <
+          Math.hypot(best.x - p.x, best.y - p.y)
+          ? s
+          : best,
+      undefined,
+    );
+    if (!nearest || Math.hypot(nearest.x - p.x, nearest.y - p.y) > radius())
+      return [];
+    const queue = [
+      {
+        ...nearest,
+        arrival: 0.05 + Math.hypot(nearest.x - p.x, nearest.y - p.y) / 900,
+        power: 1,
+        angle: Math.atan2(nearest.y - p.y, nearest.x - p.x),
+        hop: 0,
+      },
+    ];
+    const visited = new Set([nearest.seed]);
+    const limit = mobile ? 4 : BACKGROUND.relayLimit;
+    for (let i = 0; i < queue.length && queue.length < limit; i++) {
+      const parent = queue[i];
+      if (parent.hop >= 3) continue;
+      const neighbours = candidates
+        .filter((s) => !visited.has(s.seed))
+        .map((s) => ({
+          s,
+          distance: Math.hypot(s.x - parent.x, s.y - parent.y),
+        }))
+        .filter(
+          ({ s, distance }) =>
+            distance < (mobile ? 260 : 370) &&
+            Math.hypot(s.x - p.x, s.y - p.y) < radius() * 1.8,
+        )
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, mobile ? 1 : 2);
+      for (const { s, distance } of neighbours) {
+        const arrival = parent.arrival + 0.12 + distance / 1100;
+        if (
+          queue.length >= limit ||
+          arrival > BACKGROUND.burstLife - BACKGROUND.relayLife
+        )
+          continue;
+        visited.add(s.seed);
+        queue.push({
+          ...s,
+          arrival,
+          power: parent.power * 0.72,
+          angle: Math.atan2(s.y - parent.y, s.x - parent.x),
+          hop: parent.hop + 1,
+        });
+      }
+    }
+    return queue.map(({ seed, arrival, power, angle }) => ({
+      seed,
+      arrival,
+      power,
+      angle,
+    }));
+  }
+  function draw(now: number, dt = 0) {
     origin = scrollY * (media.matches ? 1 : BACKGROUND.parallax);
     layout();
     if (dirty && (media.matches || time - lastRegions > 0.06)) collectRegions();
@@ -194,7 +288,12 @@ export function createSvgBackground(
         node = objects[i];
       let x = shape.x,
         y = shape.y - origin;
-      let reaction = 0;
+      let reaction = 0,
+        targetX = 0,
+        targetY = 0,
+        targetTurn = 0,
+        resonance = 0,
+        resonanceAge = 0;
       if (!media.matches) {
         x +=
           Math.sin(time * (0.12 + shape.depth * 0.08) + shape.seed) *
@@ -213,17 +312,25 @@ export function createSvgBackground(
       }
       if (!media.matches) {
         const d = Math.hypot(x - pointer.x, y - pointer.y);
-        const force =
+        const influence =
           ease(1 - d / quality().radius) *
           ease(d / BACKGROUND.forceCore) *
-          pointer.strength *
+          pointer.strength;
+        const force =
+          influence *
           BACKGROUND.force *
           shape.depth *
           (shape.type % 2 ? -0.7 : 1);
+        const phase = time * (0.85 + shape.depth * 0.2) + shape.seed;
+        const curl = Math.sin(phase) * (mobile ? 45 : 92) * influence;
+        const breath = Math.cos(phase) * 30 * influence;
         reaction = ease(1 - d / quality().radius) * pointer.strength;
         if (d > 0.1) {
-          x += ((x - pointer.x) / d) * force;
-          y += ((y - pointer.y) / d) * force;
+          const ux = (x - pointer.x) / d,
+            uy = (y - pointer.y) / d;
+          targetX += ux * (force + breath) - uy * curl;
+          targetY += uy * (force + breath) + ux * curl;
+          targetTurn += Math.sin(phase + 0.7) * 48 * influence;
         }
         for (const b of bursts) {
           const age = clamp((now - b.born) / BACKGROUND.burstLife);
@@ -239,18 +346,63 @@ export function createSvgBackground(
             b.power;
           reaction = Math.max(reaction, Math.min(1, push / 28));
           if (distance > 0.1) {
-            x += (dx / distance) * push;
-            y += (dy / distance) * push;
+            targetX += (dx / distance) * push;
+            targetY += (dy / distance) * push;
+          }
+          for (const signal of b.relays) {
+            if (signal.seed !== shape.seed) continue;
+            const age = (now - b.born - signal.arrival) / BACKGROUND.relayLife;
+            if (age < 0 || age >= 1) continue;
+            const pulse = Math.sin(Math.PI * age) ** 2 * signal.power * b.power;
+            targetX += Math.cos(signal.angle + age * 1.4) * pulse * 58;
+            targetY += Math.sin(signal.angle + age * 1.4) * pulse * 58;
+            targetTurn += Math.sin(age * Math.PI * 2) * pulse * 44;
+            reaction = Math.max(reaction, Math.min(1, pulse));
+            if (pulse > resonance) {
+              resonance = pulse;
+              resonanceAge = age;
+            }
           }
         }
       }
+      const travel = Math.hypot(targetX, targetY),
+        limit = mobile ? 80 : 140;
+      if (travel > limit) {
+        targetX *= limit / travel;
+        targetY *= limit / travel;
+      }
+      // Closed-form damped spring: stable at both active and idle frame rates.
+      const omega = BACKGROUND.spring,
+        decay = Math.exp(-omega * dt);
+      for (const axis of ["x", "y"] as const) {
+        const target = axis === "x" ? targetX : targetY;
+        const displacement = shape.offset[axis] - target;
+        const impulse = (shape.velocity[axis] + omega * displacement) * dt;
+        shape.offset[axis] = media.matches
+          ? 0
+          : target + (displacement + impulse) * decay;
+        shape.velocity[axis] = media.matches
+          ? 0
+          : (shape.velocity[axis] - omega * impulse) * decay;
+      }
+      const turnDelta = shape.turn - targetTurn;
+      const angularImpulse = (shape.spin + omega * turnDelta) * dt;
+      shape.turn = media.matches
+        ? 0
+        : targetTurn + (turnDelta + angularImpulse) * decay;
+      shape.spin = media.matches
+        ? 0
+        : (shape.spin - omega * angularImpulse) * decay;
+      x += shape.offset.x;
+      y += shape.offset.y;
       const edge = ease(
         Math.min(y + 25, height + 25 - y, x + 10, width + 10 - x) / 45,
       );
       const rotation =
-        shape.type === 1 || shape.type === 4
+        shape.turn +
+        (shape.type === 1 || shape.type === 4
           ? Math.sin(time * 0.08 + shape.seed) * 10
-          : 0;
+          : 0);
       attr(node, "visibility", "visible");
       attr(
         node,
@@ -275,6 +427,8 @@ export function createSvgBackground(
         attr(highlight.el, "visibility", "visible");
         attr(highlight.el, "transform", node.getAttribute("transform")!);
         attr(highlight.el, "opacity", (edge * reaction).toFixed(3));
+        attr(highlight.resonance, "opacity", (resonance * 0.65).toFixed(3));
+        attr(highlight.resonance, "r", (22 + resonanceAge * 34).toFixed(2));
         const scale = 0.6 + shape.depth * 0.55,
           angle = (-rotation * Math.PI) / 180;
         const dx = pointer.x - x,
@@ -282,7 +436,7 @@ export function createSvgBackground(
         attr(
           highlight.tether,
           "d",
-          `M0 0L${((dx * Math.cos(angle) - dy * Math.sin(angle)) / scale).toFixed(2)} ${((dx * Math.sin(angle) + dy * Math.cos(angle)) / scale).toFixed(2)}`,
+          `M0 0Q${((dx * Math.cos(angle) - dy * Math.sin(angle) - dy * 0.16) / scale / 2).toFixed(2)} ${((dx * Math.sin(angle) + dy * Math.cos(angle) + dx * 0.16) / scale / 2).toFixed(2)} ${((dx * Math.cos(angle) - dy * Math.sin(angle)) / scale).toFixed(2)} ${((dx * Math.sin(angle) + dy * Math.cos(angle)) / scale).toFixed(2)}`,
         );
         attr(
           highlight.tether,
@@ -400,7 +554,7 @@ export function createSvgBackground(
       last = stamp;
       pointer.strength +=
         ((pointer.active ? 1 : 0) - pointer.strength) * (1 - Math.exp(-dt * 7));
-      draw(stamp / 1000);
+      draw(stamp / 1000, dt);
     }
     raf = requestAnimationFrame(tick);
   }
@@ -486,7 +640,13 @@ export function createSvgBackground(
       )
         recent.power = Math.min(1.4, recent.power + 0.08);
       else {
-        bursts.push({ ...p, born: now, variant: variant++ % 3, power: 1 });
+        bursts.push({
+          ...p,
+          born: now,
+          variant: variant++ % 3,
+          power: 1,
+          relays: relay(p),
+        });
         if (bursts.length > BACKGROUND.maxBursts) bursts.shift();
       }
       lastInput = time;
