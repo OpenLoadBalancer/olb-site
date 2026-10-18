@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Studio } from "./studio";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 export const repo = "https://github.com/openloadbalancer/olb";
 export const docs = `${repo}/blob/main/docs`;
@@ -355,6 +356,7 @@ function Footer() {
             <a href={`${repo}/blob/main/LICENSE`}>Apache 2.0 license</a>
           </div>
         </div>
+        <Studio />
         <div className="footer-bottom">
           <span>OpenLoadBalancer · Open source. Open infrastructure.</span>
           <a href="/brand/">
@@ -364,86 +366,7 @@ function Footer() {
             Website source <Arrow diagonal />
           </a>
         </div>
-        <div className="studio">
-          <a
-            className="studio-link"
-            href="https://oxog.net"
-            aria-label="Oxog — visit oxog.net"
-          >
-            <OxogMark />
-            <span>
-              Independent software.
-              <br />
-              <strong>Built by Oxog.</strong>
-            </span>
-            <Arrow diagonal />
-          </a>
-          <p>
-            Small team. Thoughtful tools.
-            <br />
-            Part of the Oxog ecosystem.
-          </p>
-          <a className="text-link" href="https://oxog.net">
-            Meet the studio <Arrow diagonal />
-          </a>
-        </div>
       </div>
     </footer>
-  );
-}
-function OxogMark() {
-  const ref = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    const symbol = ref.current;
-    if (
-      !symbol ||
-      matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !("IntersectionObserver" in window)
-    )
-      return;
-    symbol.dataset.motion = "waiting";
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          symbol.dataset.motion = "drawing";
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -30px 0px" },
-    );
-    observer.observe(symbol);
-    return () => observer.disconnect();
-  }, []);
-  return (
-    <svg
-      ref={ref}
-      viewBox="0 0 200 130"
-      fill="none"
-      aria-hidden="true"
-      className="studio-symbol"
-    >
-      <path
-        d="M93 56 72 35C49 13 14 24 9 53 3 84 23 104 46 103"
-        stroke="var(--oxog-pink)"
-        strokeWidth="12"
-      />
-      <path
-        d="M146 25c24-7 45 10 47 34 3 26-16 46-39 44-14-1-24-11-41-27"
-        stroke="var(--oxog-pink)"
-        strokeWidth="12"
-      />
-      <path
-        d="M76 18c30-20 75 1 77 40 1 12-1 24-6 33M53 36c-19 41 14 84 50 79 9-1 16-3 22-7"
-        stroke="var(--oxog-purple)"
-        strokeWidth="15"
-        strokeLinecap="round"
-      />
-      <path
-        d="m74 87 54-51"
-        stroke="var(--oxog-pink)"
-        strokeWidth="12"
-        strokeLinecap="square"
-      />
-    </svg>
   );
 }

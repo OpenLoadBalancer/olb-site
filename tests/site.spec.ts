@@ -4,6 +4,7 @@ for (const theme of ["light", "dark"])
   for (const width of widths) {
     test(`${theme} layout at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
       await page.addInitScript(
         (t) => localStorage.setItem("olb-theme", t),
         theme,
@@ -167,6 +168,10 @@ test("reduced motion disables traffic and signature animations", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page.locator(".studio").scrollIntoViewIfNeeded();
+  await expect(
+    page.getByRole("link", { name: "OXOGNET", exact: true }),
+  ).toBeVisible();
   expect(
     await page
       .locator(".packet-stream")
@@ -178,6 +183,41 @@ test("reduced motion disables traffic and signature animations", async ({
       .first()
       .evaluate((el) => getComputedStyle(el).animationName),
   ).toBe("none");
+});
+test("studio signature draws when it enters view and finishes fully visible", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await page.locator(".studio").scrollIntoViewIfNeeded();
+  const paths = page.locator(".studio-symbol path");
+  await expect
+    .poll(() =>
+      paths
+        .first()
+        .evaluate(
+          (el) =>
+            el
+              .getAnimations()
+              .filter((animation) => animation.playState === "running").length,
+        ),
+    )
+    .toBeGreaterThan(0);
+  await expect
+    .poll(() =>
+      paths.evaluateAll((elements) =>
+        elements.every(
+          (el) => parseFloat(getComputedStyle(el).strokeDashoffset) === 0,
+        ),
+      ),
+    )
+    .toBe(true);
+  await expect(
+    page.getByRole("link", { name: "OXOGNET", exact: true }),
+  ).toHaveAttribute("href", "https://oxog.net");
+  await expect(
+    page.getByRole("list", { name: "More from Oxog" }).getByRole("link"),
+  ).toHaveCount(4);
 });
 test("all in-page navigation targets exist", async ({ page }) => {
   for (const path of ["/", "/docs/"]) {

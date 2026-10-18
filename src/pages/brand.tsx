@@ -3,7 +3,7 @@ export default function Brand() {
   return (
     <Site
       title="Brand assets — OpenLoadBalancer"
-      description="Official OpenLoadBalancer SVG marks, light and dark wordmarks, and brand asset provenance."
+      description="Download OpenLoadBalancer logos in SVG and PNG, with versions for light and dark backgrounds."
       path="/brand/"
     >
       <div className="container">
@@ -15,8 +15,8 @@ export default function Brand() {
             Every direction.
           </h1>
           <p>
-            A single connection becomes a balanced flow. Our blue routing mark
-            puts OpenLoadBalancer's purpose at the center of its identity.
+            The OpenLoadBalancer logo, ready for your website, article, or
+            presentation. Download SVG and transparent PNG files below.
           </p>
         </section>
         <div className="docs-layout">
@@ -42,13 +42,12 @@ export default function Brand() {
             </a>
           </aside>
           <article className="docs-content">
-            <h2>A clear path in every direction.</h2>
+            <h2>Choose the right version.</h2>
             <p>
-              Five outward arrows grow from one shared entry point. The central
-              trunk represents a single listener; the branches express traffic
-              distribution. An open network enclosure frames the flow. The
-              symbol, horizontal wordmark, and stacked OLB lockup share the same
-              editable vector geometry.
+              Use the blue logo on light backgrounds and the lighter version on
+              dark backgrounds. Keep its proportions and leave a little space
+              around it. SVG works best for the web; PNG is ready for slides and
+              social posts.
             </p>
             <img
               className="brand-reference"
@@ -81,24 +80,6 @@ export default function Brand() {
                 </a>
               </div>
             </div>
-            <h2>Source & attribution</h2>
-            <p>
-              This SVG logo was reconstructed from the routing-logo reference
-              supplied by the project owner. Its geometry is shared across the
-              favicon, transparent PNG, monochrome marks, and wordmarks. Geist
-              is designed by Vercel and distributed under the SIL Open Font
-              License. The Oxog footer mark and drawing animation are adapted
-              from{" "}
-              <a href="https://github.com/cobaltdb/cobaltdb-site">
-                the CobaltDB site
-              </a>{" "}
-              at the site owner’s request.
-            </p>
-            <p>
-              OpenLoadBalancer is distributed under Apache 2.0. These assets
-              identify the project; they do not imply endorsement of third-party
-              services.
-            </p>
           </article>
         </div>
       </div>
