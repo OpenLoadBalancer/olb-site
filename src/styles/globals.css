@@ -312,7 +312,8 @@ p code {
   position: relative;
   min-height: 100svh;
 }
-.site-background {
+.site-background,
+.site-interactions {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -320,8 +321,25 @@ p code {
   display: block;
   color: var(--accent);
   pointer-events: none;
-  z-index: -1;
   opacity: 0;
+}
+.site-background {
+  z-index: -1;
+}
+.site-interactions {
+  z-index: 30;
+}
+.interaction-objects {
+  opacity: 0.42;
+}
+.pointer-ring {
+  opacity: 0.32;
+}
+:root[data-theme="light"] .interaction-objects {
+  opacity: 0.32;
+}
+:root[data-theme="light"] .pointer-ring {
+  opacity: 0.24;
 }
 .background-wires {
   opacity: 0.13;

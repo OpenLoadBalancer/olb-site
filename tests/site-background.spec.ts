@@ -13,7 +13,7 @@ test.afterEach(({ page }) => expect(errors.get(page)).toEqual([]));
 
 const svg = (page: Page) => page.locator("svg.site-background");
 const waves = (page: Page) =>
-  svg(page).locator('[data-burst][visibility="visible"]');
+  page.locator('svg.site-interactions [data-burst][visibility="visible"]');
 const poses = (page: Page) =>
   svg(page)
     .locator('[data-object][visibility="visible"]')
@@ -56,6 +56,7 @@ test("one SVG continues from hero through sections and footer on every page", as
   await page.setViewportSize({ width: 1440, height: 1000 });
   await setup(page);
   await expect(svg(page)).toHaveCount(1);
+  await expect(page.locator("svg.site-interactions")).toHaveCount(1);
   await expect(page.locator("canvas")).toHaveCount(0);
   await expect(svg(page)).toHaveCSS("pointer-events", "none");
   await expect(svg(page)).toHaveAttribute("aria-hidden", "true");
@@ -96,7 +97,7 @@ test("nearby pointer response, merged waves and dispersed clicks expire without 
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await setup(page);
-  const count = await svg(page).locator("*").count();
+  const count = await page.locator("svg.site-interactions *").count();
   const before = await poses(page);
   await page.mouse.move(700, 155);
   await page.clock.runFor(300);
@@ -107,7 +108,7 @@ test("nearby pointer response, merged waves and dispersed clicks expire without 
   for (let i = 0; i < 30; i++) await page.mouse.click(700 + (i % 5) * 50, 155);
   await page.clock.runFor(300);
   expect(await waves(page).count()).toBeLessThanOrEqual(5);
-  expect(await svg(page).locator("*").count()).toBe(count);
+  expect(await page.locator("svg.site-interactions *").count()).toBe(count);
   await page.screenshot({
     path: "test-results/screenshots/svg-background-bursts.png",
   });
@@ -215,6 +216,9 @@ test.describe("mobile SVG field", () => {
     await page.touchscreen.tap(180, 95);
     await page.clock.runFor(300);
     await expect(waves(page)).toHaveCount(1);
+    await expect(
+      page.locator("svg.site-interactions [data-pointer]"),
+    ).toHaveAttribute("visibility", "hidden");
     await page.clock.runFor(2300);
     await expect(waves(page)).toHaveCount(0);
     const host = page.locator(".site-shell"),

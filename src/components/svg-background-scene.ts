@@ -5,15 +5,18 @@ export const BACKGROUND = {
   maxBursts: 5,
   rays: 8,
   mobileWidth: 760,
-  desktop: { objects: 72, columns: 12, fps: 32, radius: 180 },
-  mobile: { objects: 12, columns: 2, fps: 24, radius: 110 },
+  desktop: { objects: 72, columns: 12, fps: 40, radius: 285 },
+  mobile: { objects: 12, columns: 2, fps: 24, radius: 160 },
   idleAfter: 4,
   idleFps: 16,
   parallax: 0.22,
   drift: 9,
-  force: 24,
+  force: 76,
+  forceCore: 64,
   burstLife: 2,
-  burstRadius: 240,
+  burstRadius: 340,
+  trailLife: 0.75,
+  maxTrail: 18,
   mergeWindow: 0.16,
   mergeRadius: 32,
   quietSelector:
@@ -34,11 +37,15 @@ const random = (n: number) => {
   return v - Math.floor(v);
 };
 const ignore =
-  "a,button,input,select,textarea,label,summary,[role=button],[contenteditable],h1,h2,h3,p,pre,code,li,.theme-picker,.traffic-console,[data-background-ignore]";
+  "a,button,input,select,textarea,label,summary,[role=button],[contenteditable],.theme-picker,[data-background-ignore]";
 const attr = (node: Element, key: string, value: number | string) =>
   node.setAttribute(key, String(value));
 
-export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
+export function createSvgBackground(
+  svg: SVGSVGElement,
+  feedback: SVGSVGElement,
+  host: HTMLElement,
+) {
   const objects = [...svg.querySelectorAll<SVGGElement>("[data-object]")];
   const glyphs = objects.map((el) => el.querySelector("use")!);
   const routes = [...svg.querySelectorAll<SVGGElement>("[data-route]")].map(
@@ -48,14 +55,27 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
       packet: el.querySelector("[data-packet]")!,
     }),
   );
-  const effects = [...svg.querySelectorAll<SVGGElement>("[data-burst]")].map(
-    (el) => ({
-      el,
-      ring: el.querySelector("[data-ring]")!,
-      echo: el.querySelector("[data-echo]")!,
-      sparks: [...el.querySelectorAll("[data-spark]")],
-    }),
-  );
+  const reactive = [
+    ...feedback.querySelectorAll<SVGGElement>("[data-reactive]"),
+  ].map((el) => ({
+    el,
+    glyph: el.querySelector("use")!,
+    tether: el.querySelector("path")!,
+  }));
+  const halo = feedback.querySelector("[data-pointer]")!;
+  const haloRing = halo.querySelector(".pointer-ring")!;
+  const trailGradient = feedback.querySelector("[data-trail-gradient]")!;
+  const trailGroup = feedback.querySelector("[data-trail]")!;
+  const trailLine = feedback.querySelector("[data-trail-line]")!;
+  const trailGlow = feedback.querySelector("[data-trail-glow]")!;
+  const effects = [
+    ...feedback.querySelectorAll<SVGGElement>("[data-burst]"),
+  ].map((el) => ({
+    el,
+    ring: el.querySelector("[data-ring]")!,
+    echo: el.querySelector("[data-echo]")!,
+    sparks: [...el.querySelectorAll("[data-spark]")],
+  }));
   const media = matchMedia("(prefers-reduced-motion: reduce)");
   let width = 1,
     height = 1,
@@ -79,6 +99,7 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
     disposed = false,
     variant = 0;
   const pointer = { x: 0, y: 0, active: false, strength: 0 };
+  let trail: (Point & { born: number })[] = [];
   let down: (Point & { at: number; id: number; moved: boolean }) | null = null;
   const visibleRegions = new Set<Element>();
   const quality = () => (mobile ? BACKGROUND.mobile : BACKGROUND.desktop);
@@ -122,9 +143,12 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
           "href",
           `#${glyphs[i].getAttribute("data-glyph-prefix")}-${names[type]}`,
         );
+        attr(reactive[i].glyph, "href", glyphs[i].getAttribute("href")!);
       }
-    for (let i = shapes.length; i < objects.length; i++)
+    for (let i = shapes.length; i < objects.length; i++) {
       attr(objects[i], "visibility", "hidden");
+      attr(reactive[i].el, "visibility", "hidden");
+    }
     for (let i = 0; i < routes.length; i++) {
       const route = routes[i];
       if (i >= rows) {
@@ -152,6 +176,7 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
     );
     spacing = height / Math.max(2, rows - 2);
     attr(svg, "viewBox", `0 0 ${width} ${height}`);
+    attr(feedback, "viewBox", `0 0 ${width} ${height}`);
     firstRow = NaN;
     dirty = true;
     draw(performance.now() / 1000);
@@ -162,11 +187,14 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
     if (dirty && (media.matches || time - lastRegions > 0.06)) collectRegions();
     const intro = media.matches ? 1 : ease(entered / 0.8);
     svg.style.opacity = String(intro);
+    feedback.style.opacity = String(intro);
+    bursts = bursts.filter((b) => now - b.born < BACKGROUND.burstLife);
     for (let i = 0; i < shapes.length; i++) {
       const shape = shapes[i],
         node = objects[i];
       let x = shape.x,
         y = shape.y - origin;
+      let reaction = 0;
       if (!media.matches) {
         x +=
           Math.sin(time * (0.12 + shape.depth * 0.08) + shape.seed) *
@@ -180,29 +208,36 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
       if (y < -50 || y > height + 50) {
         if (node.getAttribute("visibility") !== "hidden")
           attr(node, "visibility", "hidden");
+        attr(reactive[i].el, "visibility", "hidden");
         continue;
       }
       if (!media.matches) {
         const d = Math.hypot(x - pointer.x, y - pointer.y);
         const force =
           ease(1 - d / quality().radius) *
+          ease(d / BACKGROUND.forceCore) *
           pointer.strength *
           BACKGROUND.force *
           shape.depth *
           (shape.type % 2 ? -0.7 : 1);
+        reaction = ease(1 - d / quality().radius) * pointer.strength;
         if (d > 0.1) {
           x += ((x - pointer.x) / d) * force;
           y += ((y - pointer.y) / d) * force;
         }
         for (const b of bursts) {
           const age = clamp((now - b.born) / BACKGROUND.burstLife);
-          const dy = y - (b.y - origin),
+          const dy = y - b.y,
             dx = x - b.x,
             distance = Math.hypot(dx, dy);
           const push =
-            Math.max(0, 1 - Math.abs(distance - ease(age) * radius()) / 45) *
+            Math.max(0, 1 - Math.abs(distance - ease(age) * radius()) / 85) *
             (1 - age) *
-            15;
+            ease(age / 0.08) *
+            ease(distance / BACKGROUND.forceCore) *
+            52 *
+            b.power;
+          reaction = Math.max(reaction, Math.min(1, push / 28));
           if (distance > 0.1) {
             x += (dx / distance) * push;
             y += (dy / distance) * push;
@@ -225,8 +260,40 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
       attr(
         node,
         "opacity",
-        (edge * quiet(x, y) * (0.4 + shape.depth * 0.6)).toFixed(3),
+        (
+          edge *
+          quiet(x, y) *
+          (0.4 + shape.depth * 0.6) *
+          (1 - reaction)
+        ).toFixed(3),
       );
+      const highlight = reactive[i];
+      if (media.matches || reaction < 0.015) {
+        if (highlight.el.getAttribute("visibility") !== "hidden")
+          attr(highlight.el, "visibility", "hidden");
+      } else {
+        attr(highlight.el, "visibility", "visible");
+        attr(highlight.el, "transform", node.getAttribute("transform")!);
+        attr(highlight.el, "opacity", (edge * reaction).toFixed(3));
+        const scale = 0.6 + shape.depth * 0.55,
+          angle = (-rotation * Math.PI) / 180;
+        const dx = pointer.x - x,
+          dy = pointer.y - y;
+        attr(
+          highlight.tether,
+          "d",
+          `M0 0L${((dx * Math.cos(angle) - dy * Math.sin(angle)) / scale).toFixed(2)} ${((dx * Math.sin(angle) + dy * Math.cos(angle)) / scale).toFixed(2)}`,
+        );
+        attr(
+          highlight.tether,
+          "opacity",
+          (
+            pointer.strength *
+            ease(1 - Math.hypot(dx, dy) / quality().radius) *
+            0.25
+          ).toFixed(3),
+        );
+      }
     }
     for (let i = 0; i < rows; i++) {
       const route = routes[i],
@@ -245,7 +312,43 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
         (-(time * (6 + (Math.abs(worldRow) % 3)) + worldRow * 113)).toFixed(2),
       );
     }
-    bursts = bursts.filter((b) => now - b.born < BACKGROUND.burstLife);
+    const tracking = !media.matches && pointer.strength > 0.015;
+    attr(halo, "visibility", tracking ? "visible" : "hidden");
+    if (tracking) {
+      attr(
+        halo,
+        "transform",
+        `translate(${pointer.x.toFixed(2)} ${pointer.y.toFixed(2)})`,
+      );
+      attr(halo, "opacity", pointer.strength.toFixed(3));
+      attr(haloRing, "r", (26 + Math.sin(time * 2.5) * 3).toFixed(2));
+    }
+    trail = trail.filter((p) => now - p.born < BACKGROUND.trailLife);
+    attr(
+      trailGroup,
+      "visibility",
+      !media.matches && trail.length > 1 ? "visible" : "hidden",
+    );
+    if (!media.matches && trail.length > 1) {
+      let d = `M${trail[0].x} ${trail[0].y}`;
+      for (let i = 1; i < trail.length - 1; i++)
+        d += `Q${trail[i].x} ${trail[i].y} ${(trail[i].x + trail[i + 1].x) / 2} ${(trail[i].y + trail[i + 1].y) / 2}`;
+      d += `L${trail.at(-1)!.x} ${trail.at(-1)!.y}`;
+      attr(trailGradient, "x1", trail[0].x);
+      attr(trailGradient, "y1", trail[0].y);
+      attr(trailGradient, "x2", trail.at(-1)!.x);
+      attr(trailGradient, "y2", trail.at(-1)!.y);
+      attr(trailLine, "d", d);
+      attr(trailGlow, "d", d);
+      attr(
+        trailGroup,
+        "opacity",
+        (
+          (1 - (now - trail.at(-1)!.born) / BACKGROUND.trailLife) *
+          pointer.strength
+        ).toFixed(3),
+      );
+    }
     for (let i = 0; i < effects.length; i++) {
       const effect = effects[i],
         b = bursts[i];
@@ -261,7 +364,7 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
       attr(
         effect.el,
         "transform",
-        `translate(${b.x.toFixed(2)} ${(b.y - origin).toFixed(2)})`,
+        `translate(${b.x.toFixed(2)} ${b.y.toFixed(2)})`,
       );
       attr(effect.el, "opacity", fade.toFixed(3));
       attr(effect.ring, "r", r.toFixed(2));
@@ -311,9 +414,11 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
         ? "running"
         : "paused";
     attr(svg, "data-motion", state);
+    attr(feedback, "data-motion", state);
     if (state === "running") raf = requestAnimationFrame(tick);
     else if (state === "reduced") {
       bursts = [];
+      trail = [];
       pointer.active = false;
       pointer.strength = 0;
       down = null;
@@ -323,7 +428,6 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
   function scroll() {
     dirty = true;
     down = null;
-    pointer.active = false;
     if (media.matches && !document.hidden && !raf)
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -336,10 +440,17 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
     if (e.pointerType === "touch" || media.matches) return;
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    pointer.active = !(
-      e.target instanceof Element &&
-      e.target.closest("a,button,input,select,textarea,[role=button]")
-    );
+    pointer.active = true;
+    const previous = trail.at(-1),
+      now = performance.now() / 1000;
+    if (
+      !previous ||
+      (Math.hypot(pointer.x - previous.x, pointer.y - previous.y) > 10 &&
+        now - previous.born > 0.02)
+    ) {
+      trail.push({ x: pointer.x, y: pointer.y, born: now });
+      if (trail.length > BACKGROUND.maxTrail) trail.shift();
+    }
     if (pointer.active) lastInput = time;
   }
   const excluded = (e: PointerEvent) =>
@@ -362,9 +473,10 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
       !down.moved &&
       !excluded(e) &&
       !media.matches &&
+      (getSelection()?.isCollapsed ?? true) &&
       performance.now() - down.at < 550
     ) {
-      const p = { x: e.clientX, y: e.clientY + scrollY * BACKGROUND.parallax },
+      const p = { x: e.clientX, y: e.clientY },
         now = performance.now() / 1000;
       const recent = bursts.at(-1);
       if (
@@ -419,11 +531,14 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
   const resize = new ResizeObserver(measure);
   resize.observe(svg);
   resize.observe(host);
-  host.addEventListener("pointermove", move, { passive: true });
-  host.addEventListener("pointerdown", press, { passive: true });
-  host.addEventListener("pointerup", release, { passive: true });
-  host.addEventListener("pointercancel", leave, { passive: true });
-  host.addEventListener("pointerleave", leave, { passive: true });
+  window.addEventListener("pointermove", move, { passive: true });
+  window.addEventListener("pointerdown", press, { passive: true });
+  window.addEventListener("pointerup", release, { passive: true });
+  window.addEventListener("pointercancel", leave, { passive: true });
+  document.documentElement.addEventListener("pointerleave", leave, {
+    passive: true,
+  });
+  window.addEventListener("blur", leave);
   window.addEventListener("scroll", scroll, { passive: true });
   window.addEventListener("resize", measure, { passive: true });
   document.addEventListener("visibilitychange", visibility);
@@ -442,11 +557,12 @@ export function createSvgBackground(svg: SVGSVGElement, host: HTMLElement) {
     resize.disconnect();
     regionsObserver.disconnect();
     sceneObserver.disconnect();
-    host.removeEventListener("pointermove", move);
-    host.removeEventListener("pointerdown", press);
-    host.removeEventListener("pointerup", release);
-    host.removeEventListener("pointercancel", leave);
-    host.removeEventListener("pointerleave", leave);
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerdown", press);
+    window.removeEventListener("pointerup", release);
+    window.removeEventListener("pointercancel", leave);
+    document.documentElement.removeEventListener("pointerleave", leave);
+    window.removeEventListener("blur", leave);
     window.removeEventListener("scroll", scroll);
     window.removeEventListener("resize", measure);
     document.removeEventListener("visibilitychange", visibility);
