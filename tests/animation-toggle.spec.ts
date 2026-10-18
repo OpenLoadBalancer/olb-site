@@ -24,7 +24,7 @@ async function open(page: Page) {
   await page.clock.runFor(1000);
 }
 
-test("header animation control removes loops and listeners, clears effects, and restarts without duplicates", async ({
+test("mouse control clears feedback and pointer listeners while ambient animation continues without restarting", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -104,20 +104,28 @@ test("header animation control removes loops and listeners, clears effects, and 
       pending.delete(id);
       cancel(id);
     };
-    let mutations = 0;
+    let ambientMutations = 0,
+      feedbackMutations = 0;
     new MutationObserver((records) => {
       for (const r of records)
-        if (
+        if (r.target instanceof Element && r.target.closest(".site-background"))
+          ambientMutations++;
+        else if (
           r.target instanceof Element &&
-          r.target.closest(".site-background,.site-interactions")
+          r.target.closest(".site-interactions")
         )
-          mutations++;
-    }).observe(document, { subtree: true, attributes: true });
+          feedbackMutations++;
+    }).observe(document, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["transform", "stroke-dashoffset"],
+    });
     Object.assign(window, {
       backgroundProbe: () => ({
         listeners: tracked.length,
         pending: pending.size,
-        mutations,
+        ambientMutations,
+        feedbackMutations,
       }),
     });
   });
@@ -128,23 +136,26 @@ test("header animation control removes loops and listeners, clears effects, and 
           backgroundProbe: () => {
             listeners: number;
             pending: number;
-            mutations: number;
+            ambientMutations: number;
+            feedbackMutations: number;
           };
         }
       ).backgroundProbe(),
     );
-  await expect(toggle(page)).toHaveAccessibleName("Animasyonları aç");
+  await expect(background(page)).toHaveAttribute("data-motion", "running");
+  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini aç");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "false");
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
+  await page.clock.runFor(100);
   const idle = await probe();
-  expect(idle.pending).toBe(0);
+  expect(idle.pending).toBe(1);
   await toggle(page).focus();
-  await expect(page.getByRole("tooltip")).toHaveText("Animasyonları aç");
+  await expect(page.getByRole("tooltip")).toHaveText("Fare efektlerini aç");
   await toggle(page).press("Escape");
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   await toggle(page).press("Enter");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
-  await expect(toggle(page)).toHaveAccessibleName("Animasyonları kapat");
+  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini kapat");
   await page.mouse.click(700, 155);
   await page.clock.runFor(300);
   await expect(background(page)).toHaveAttribute("data-motion", "running");
@@ -156,19 +167,25 @@ test("header animation control removes loops and listeners, clears effects, and 
   expect(active.pending).toBe(1);
   await toggle(page).focus();
   await toggle(page).press("Space");
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(background(page)).toHaveAttribute("data-motion", "running");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
   await expect(feedback(page).locator('[visibility="visible"]')).toHaveCount(0);
-  await expect(background(page)).toHaveCSS("opacity", "0");
+  await expect(feedback(page)).toHaveCSS("opacity", "0");
+  await expect(background(page)).toHaveCSS("opacity", "1");
   await page.clock.runFor(100);
   const stopped = await probe();
   expect(stopped.listeners).toBe(idle.listeners);
-  expect(stopped.pending).toBe(0);
+  expect(stopped.pending).toBe(1);
   await page.mouse.move(800, 180);
   await page.mouse.click(800, 180);
   await page.evaluate(() => scrollTo({ top: 200, behavior: "instant" }));
   await page.setViewportSize({ width: 1400, height: 1000 });
   await page.clock.runFor(1500);
-  expect(await probe()).toEqual(stopped);
+  const later = await probe();
+  expect(later.feedbackMutations).toBe(stopped.feedbackMutations);
+  expect(later.ambientMutations).toBeGreaterThan(stopped.ambientMutations);
+  expect(later.listeners).toBe(stopped.listeners);
+  expect(later.pending).toBe(1);
   // Product controls and traffic animations keep working independently.
   await page.getByRole("button", { name: "Simulate failure" }).click();
   await expect(
@@ -188,7 +205,7 @@ test("header animation control removes loops and listeners, clears effects, and 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   // UI automation may install its own listeners while exercising the product.
   // Compare each restart with the disabled baseline after those controls settle.
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
   const controlsIdle = await probe();
   for (let i = 0; i < 3; i++) {
     await toggle(page).click();
@@ -200,7 +217,9 @@ test("header animation control removes loops and listeners, clears effects, and 
     await toggle(page).click();
     await page.clock.runFor(100);
     expect((await probe()).listeners).toBe(controlsIdle.listeners);
-    expect((await probe()).pending).toBe(0);
+    expect((await probe()).pending).toBe(1);
+    await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
+    await expect(background(page)).toHaveCSS("opacity", "1");
   }
 });
 
@@ -210,7 +229,7 @@ test("system motion is the initial default and an explicit choice persists in bo
   await page.emulateMedia({ reducedMotion: "reduce" });
   await open(page);
   await expect(background(page)).toHaveAttribute("data-motion", "reduced");
-  await expect(toggle(page)).toHaveAccessibleName("Animasyonları aç");
+  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini aç");
   expect(
     await page.evaluate((key) => localStorage.getItem(key), key),
   ).toBeNull();
@@ -235,14 +254,16 @@ test("system motion is the initial default and an explicit choice persists in bo
   await toggle(page).click();
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.reload();
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(background(page)).toHaveAttribute("data-motion", "running");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "false");
   expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(
     "off",
   );
   await page.goto("/docs/");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "false");
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(background(page)).toHaveAttribute("data-motion", "running");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
 });
 
 test("motion preference synchronizes across tabs and clearing it restores the system default", async ({
@@ -282,7 +303,8 @@ test("the motion control works when local storage is blocked", async ({
   });
   await open(page);
   await toggle(page).click();
-  await expect(background(page)).toHaveAttribute("data-motion", "disabled");
+  await expect(background(page)).toHaveAttribute("data-motion", "running");
+  await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
   await toggle(page).click();
   await expect(background(page)).toHaveAttribute("data-motion", "running");
 });

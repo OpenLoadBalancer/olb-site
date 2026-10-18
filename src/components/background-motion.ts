@@ -61,3 +61,13 @@ export function setBackgroundMotion(enabled: boolean) {
 export function useBackgroundMotion() {
   return useSyncExternalStore(subscribe, snapshot, () => "pending" as Mode);
 }
+export function useAmbientMotion() {
+  return useSyncExternalStore(
+    subscribe,
+    () => {
+      initialize();
+      return !media!.matches;
+    },
+    () => false,
+  );
+}
