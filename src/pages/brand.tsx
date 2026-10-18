@@ -1,4 +1,4 @@
-import { Site, repo } from "@/components/site";
+import { Site } from "@/components/site";
 export default function Brand() {
   return (
     <Site
@@ -10,12 +10,13 @@ export default function Brand() {
         <section className="doc-hero">
           <div className="eyebrow accent">OPENLOADBALANCER / BRAND</div>
           <h1>
-            A familiar mark.
-            <br />A clearer canvas.
+            Meet your
+            <br />
+            traffic controller.
           </h1>
           <p>
-            The original blue-to-indigo OLB mark, preserved in crisp SVG. Ready
-            for light and dark backgrounds.
+            A friendly face for serious infrastructure. Our traffic-controller
+            gopher brings an open-source spirit to every route.
           </p>
         </section>
         <div className="docs-layout">
@@ -24,20 +25,37 @@ export default function Brand() {
             <a href="/brand/mark.svg" download>
               Download SVG mark
             </a>
+            <a href="/brand/mark.png" download>
+              Download transparent PNG
+            </a>
+            <a href="/brand/mark-mono-dark.svg" download>
+              Download dark mono SVG
+            </a>
+            <a href="/brand/mark-mono-light.svg" download>
+              Download light mono SVG
+            </a>
           </aside>
           <article className="docs-content">
-            <h2>Made to stay recognizable.</h2>
+            <h2>A clear path. A character of its own.</h2>
             <p>
-              The rounded square, gradient, and OLB letter proportions follow
-              the upstream website favicon. The wordmarks extend the original
-              identity for different backgrounds.
+              The turquoise gopher and orange hard hat celebrate the project's
+              traffic-controller mascot. A three-way route on the helmet turns
+              one incoming connection into a balanced flow. Clean shapes and a
+              strong outline keep the mark recognizable at small sizes.
             </p>
+            <img
+              className="brand-reference"
+              src="/brand/preview.png"
+              width="1200"
+              height="640"
+              alt="Original traffic-controller gopher logo on dark and light backgrounds, with small-size examples"
+            />
             <div className="brand-grid">
               <div className="brand-tile">
                 <img
                   src="/brand/wordmark-dark.svg"
-                  width="360"
-                  height="64"
+                  width="420"
+                  height="80"
                   alt="OpenLoadBalancer wordmark on dark"
                 />
                 <a href="/brand/wordmark-dark.svg" download>
@@ -47,8 +65,8 @@ export default function Brand() {
               <div className="brand-tile">
                 <img
                   src="/brand/wordmark-light.svg"
-                  width="360"
-                  height="64"
+                  width="420"
+                  height="80"
                   alt="OpenLoadBalancer wordmark on light"
                 />
                 <a href="/brand/wordmark-light.svg" download>
@@ -58,13 +76,12 @@ export default function Brand() {
             </div>
             <h2>Source & attribution</h2>
             <p>
-              The OLB symbol is sourced from{" "}
-              <a href={`${repo}/blob/main/website-new/public/favicon.svg`}>
-                the OpenLoadBalancer product repository
-              </a>
-              . Geist is designed by Vercel and distributed under the SIL Open
-              Font License. The Oxog footer mark and drawing animation are
-              adapted from{" "}
+              This logo is original SVG artwork created for OpenLoadBalancer,
+              inspired by the project's illustrated traffic-controller gopher.
+              Its geometry is shared across the favicon, transparent PNG,
+              monochrome marks, and wordmarks. Geist is designed by Vercel and
+              distributed under the SIL Open Font License. The Oxog footer mark
+              and drawing animation are adapted from{" "}
               <a href="https://github.com/cobaltdb/cobaltdb-site">
                 the CobaltDB site
               </a>{" "}

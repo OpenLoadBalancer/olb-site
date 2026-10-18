@@ -1,1 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#111312"/><g stroke="#303631"><path d="M65 110h1070M65 530h1070"/><path d="M800 220h100v100h180M800 320h280M800 420h100V320" fill="none"/></g><rect x="70" y="48" width="42" height="42" rx="8" fill="#4f72f3"/><text x="91" y="75" fill="white" font-size="16" font-family="Arial" font-weight="700" text-anchor="middle">OLB</text><text x="127" y="77" fill="#f1f1e9" font-family="Arial" font-size="26">OpenLoadBalancer</text><text x="70" y="250" fill="#f1f1e9" font-size="86" font-family="Arial" letter-spacing="-5">Your traffic.</text><text x="70" y="345" fill="#ff886b" font-size="86" font-family="Arial" letter-spacing="-5">Your rules.</text><text x="75" y="410" fill="#a1aaa3" font-family="Arial" font-size="23">One Go binary. Full control.</text><rect x="740" y="275" width="105" height="90" rx="12" fill="#ff886b"/><text x="792" y="330" text-anchor="middle" fill="#111312" font-family="Arial" font-size="29" font-weight="700">OLB</text><rect x="1010" y="200" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="220" r="4" fill="#9eccac"/><text x="1040" y="224" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><rect x="1010" y="300" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="320" r="4" fill="#9eccac"/><text x="1040" y="324" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><rect x="1010" y="400" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="420" r="4" fill="#9eccac"/><text x="1040" y="424" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><text x="75" y="575" fill="#a1aaa3" font-family="Arial" font-size="17">L4 / L7 LOAD BALANCER</text><text x="1125" y="575" text-anchor="end" fill="#ff886b" font-family="Arial" font-size="17">openloadbalancer.dev</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#111312"/><g stroke="#303631"><path d="M65 110h1070M65 530h1070"/><path d="M800 220h100v100h180M800 320h280M800 420h100V320" fill="none"/></g><g transform="translate(67 32) scale(.58)"><g stroke="#182c34" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="17" cy="45" r="8.5" fill="#70ced8"/>
+    <circle cx="79" cy="45" r="8.5" fill="#70ced8"/>
+    <path d="M21 39C21 29 75 29 75 39v26c0 16-11 24-27 24S21 81 21 65Z" fill="#70ced8"/>
+    <path d="M21 33C22 17 31 9 43 8h10c13 1 22 10 23 25" fill="#ff9762"/>
+    <path d="M17 33c17-5 45-5 62 0l2 7c-22-4-44-4-66 0Z" fill="#ff9762"/>
+    <path d="M48 27V16m0 8c-8 0-10-3-10-7m10 7c8 0 10-3 10-7" fill="none" stroke="#fff8eb" stroke-width="3.5"/>
+    <ellipse cx="35" cy="53" rx="10.5" ry="12" fill="#fff8eb"/>
+    <ellipse cx="61" cy="53" rx="10.5" ry="12" fill="#fff8eb"/>
+    <ellipse cx="37.5" cy="53.5" rx="3.7" ry="5" fill="#182c34" stroke="none"/>
+    <ellipse cx="58.5" cy="53.5" rx="3.7" ry="5" fill="#182c34" stroke="none"/>
+    <path d="M39 72c3 4 15 4 18 0" fill="none" stroke="#182c34" stroke-width="2.6"/>
+    <path d="M42 74h6v6h-6ZM48 74h6v6h-6Z" fill="#fff8eb" stroke-width="2"/>
+    <ellipse cx="48" cy="66" rx="6" ry="4" fill="#182c34" stroke="none"/>
+  </g></g><text x="127" y="77" fill="#f1f1e9" font-family="Arial" font-size="26">OpenLoadBalancer</text><text x="70" y="250" fill="#f1f1e9" font-size="86" font-family="Arial" letter-spacing="-5">Your traffic.</text><text x="70" y="345" fill="#ff886b" font-size="86" font-family="Arial" letter-spacing="-5">Your rules.</text><text x="75" y="410" fill="#a1aaa3" font-family="Arial" font-size="23">One Go binary. Full control.</text><g transform="translate(730 257) scale(1.3)"><g stroke="#182c34" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="17" cy="45" r="8.5" fill="#70ced8"/>
+    <circle cx="79" cy="45" r="8.5" fill="#70ced8"/>
+    <path d="M21 39C21 29 75 29 75 39v26c0 16-11 24-27 24S21 81 21 65Z" fill="#70ced8"/>
+    <path d="M21 33C22 17 31 9 43 8h10c13 1 22 10 23 25" fill="#ff9762"/>
+    <path d="M17 33c17-5 45-5 62 0l2 7c-22-4-44-4-66 0Z" fill="#ff9762"/>
+    <path d="M48 27V16m0 8c-8 0-10-3-10-7m10 7c8 0 10-3 10-7" fill="none" stroke="#fff8eb" stroke-width="3.5"/>
+    <ellipse cx="35" cy="53" rx="10.5" ry="12" fill="#fff8eb"/>
+    <ellipse cx="61" cy="53" rx="10.5" ry="12" fill="#fff8eb"/>
+    <ellipse cx="37.5" cy="53.5" rx="3.7" ry="5" fill="#182c34" stroke="none"/>
+    <ellipse cx="58.5" cy="53.5" rx="3.7" ry="5" fill="#182c34" stroke="none"/>
+    <path d="M39 72c3 4 15 4 18 0" fill="none" stroke="#182c34" stroke-width="2.6"/>
+    <path d="M42 74h6v6h-6ZM48 74h6v6h-6Z" fill="#fff8eb" stroke-width="2"/>
+    <ellipse cx="48" cy="66" rx="6" ry="4" fill="#182c34" stroke="none"/>
+  </g></g><rect x="1010" y="200" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="220" r="4" fill="#9eccac"/><text x="1040" y="224" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><rect x="1010" y="300" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="320" r="4" fill="#9eccac"/><text x="1040" y="324" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><rect x="1010" y="400" width="110" height="40" rx="5" fill="#1c201d" stroke="#505c52"/><circle cx="1025" cy="420" r="4" fill="#9eccac"/><text x="1040" y="424" fill="#a1aaa3" font-family="monospace" font-size="11">BACKEND</text><text x="75" y="575" fill="#a1aaa3" font-family="Arial" font-size="17">L4 / L7 LOAD BALANCER</text><text x="1125" y="575" text-anchor="end" fill="#ff886b" font-family="Arial" font-size="17">openloadbalancer.dev</text></svg>

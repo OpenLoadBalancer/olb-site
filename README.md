@@ -34,7 +34,7 @@ The preview serves `out/` at http://127.0.0.1:4173. Tests cover three routes at 
 - Native CSS animations, real SVG request diagrams, and React state for the illustrative traffic explorer. It does not connect to a running load balancer or represent measured traffic.
 - Light/dark/system preference is applied synchronously in the document head before paint, persists in localStorage, and follows OS and cross-tab changes.
 - Local Geist font, with the original SIL OFL license. No runtime font or third-party CDN requests.
-- The original upstream OLB SVG mark, light/dark wordmarks, PNG Open Graph artwork, sitemap, robots, custom 404, and brand downloads are included.
+- An original traffic-controller gopher SVG mark, monochrome variants, light/dark wordmarks, PNG Open Graph artwork, sitemap, robots, custom 404, and brand downloads are included.
 
 ## Deploy
 
@@ -57,4 +57,4 @@ AAAA  2606:50c0:8003::153
 
 The website contains a getting-started guide and links to authoritative upstream documentation. Product claims and installers are sourced from a pinned product revision; see [research and provenance](docs/RESEARCH.md). Installer scripts are served byte-for-byte from that revision rather than rewritten.
 
-`scripts/create-assets.mjs` regenerates the checked-in SVG wordmarks and the 1200×630 Open Graph PNG using pinned Sharp. Run it with `node scripts/create-assets.mjs`, then rebuild.
+`scripts/create-assets.mjs` regenerates the original SVG logo, monochrome variants, transparent PNG and Apple icon, wordmarks, preview board, and the 1200×630 Open Graph PNG using pinned Sharp. Run it with `node scripts/create-assets.mjs`, then rebuild.

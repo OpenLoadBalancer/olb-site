@@ -274,6 +274,7 @@ export function Site({
         <meta name="theme-color" content="#111312" />
         <link rel="canonical" href={`https://openloadbalancer.dev${path}`} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta

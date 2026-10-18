@@ -22,11 +22,11 @@ All seven reference websites were inspected through their HTML and stylesheets, 
 | https://anubis.watch    | Editorial contrast, distinctive typography, clear process narrative. Live TLS could not be validated during reference research. |
 | https://cachestorm.com  | Engine illustration, restrained technical palette, configuration-led quick start and responsive layout.                         |
 
-The new site uses its own graphite/cream and coral visual direction with original request-flow and pipeline SVGs. It preserves the original OLB identity rather than copying another product's illustration. Shared container width is 1720px, with centrally managed fluid gutters and section spacing. Mobile architecture uses a vertical SVG instead of clipping the desktop diagram.
+The new site uses its own graphite/cream and coral visual direction with original request-flow and pipeline SVGs. Its original traffic-controller gopher identity is inspired by the project illustration supplied by the owner. Shared container width is 1720px, with centrally managed fluid gutters and section spacing. Mobile architecture uses a vertical SVG instead of clipping the desktop diagram.
 
 ## Assets
 
-- `public/brand/mark.svg` and `public/favicon.svg`: original [OLB favicon](https://github.com/openloadbalancer/olb/blob/dbde63563bc2734288cb671af5ed17d56b57fbd3/website-new/public/favicon.svg), also checked against the original live site's favicon. Original 32×32 geometry, 6px corner radius, blue→indigo gradient, white OLB lettering preserved.
+- `public/brand/mark.svg` and `public/favicon.svg`: original traffic-controller gopher SVG drawn for the site at the owner's request. Inspired by the turquoise gopher and orange hard hat in the supplied project illustration; no raster tracing or embedded bitmap. The helmet carries a three-way traffic-routing symbol. Geometry is defined in `scripts/brand-geometry.mjs`, with color, dark/light monochrome, transparent PNG, and Apple touch icon exports. This replaces the temporary OLB-letter favicon used in the first site release.
 - Light/dark wordmarks and `public/og.svg` / `public/og.png`: created for this site. Regeneration source: `scripts/create-assets.mjs`.
 - Traffic and architecture diagrams: original SVG in `src/components/traffic.tsx`. Reduced-motion support disables animated flow.
 - Oxog mark: exact four paths and 200×130 viewBox from [CobaltDB's Oxog component](https://github.com/cobaltdb/cobaltdb-site/blob/0b25719fef274c577ea4e3662a7e63dac2199c9c/src/components/oxog-mark.tsx). Preserves the original 1.6s drawing curve and 0/.25/.5/.9s stagger. Adapted colors match both site themes; mark links to https://oxog.net.
