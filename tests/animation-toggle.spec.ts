@@ -143,19 +143,19 @@ test("mouse control clears feedback and pointer listeners while ambient animatio
       ).backgroundProbe(),
     );
   await expect(background(page)).toHaveAttribute("data-motion", "running");
-  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini aç");
+  await expect(toggle(page)).toHaveAccessibleName("Enable mouse effects");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "false");
   await expect(feedback(page)).toHaveAttribute("data-motion", "disabled");
   await page.clock.runFor(100);
   const idle = await probe();
   expect(idle.pending).toBe(1);
   await toggle(page).focus();
-  await expect(page.getByRole("tooltip")).toHaveText("Fare efektlerini aç");
+  await expect(page.getByRole("tooltip")).toHaveText("Enable mouse effects");
   await toggle(page).press("Escape");
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   await toggle(page).press("Enter");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
-  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini kapat");
+  await expect(toggle(page)).toHaveAccessibleName("Disable mouse effects");
   await page.mouse.click(700, 155);
   await page.clock.runFor(300);
   await expect(background(page)).toHaveAttribute("data-motion", "running");
@@ -229,7 +229,7 @@ test("system motion is the initial default and an explicit choice persists in bo
   await page.emulateMedia({ reducedMotion: "reduce" });
   await open(page);
   await expect(background(page)).toHaveAttribute("data-motion", "reduced");
-  await expect(toggle(page)).toHaveAccessibleName("Fare efektlerini aç");
+  await expect(toggle(page)).toHaveAccessibleName("Enable mouse effects");
   expect(
     await page.evaluate((key) => localStorage.getItem(key), key),
   ).toBeNull();

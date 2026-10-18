@@ -7,7 +7,7 @@ import { setBackgroundMotion, useBackgroundMotion } from "./background-motion";
 export function AnimationToggle() {
   const mode = useBackgroundMotion();
   const enabled = mode === "enabled";
-  const label = enabled ? "Fare efektlerini kapat" : "Fare efektlerini aç";
+  const label = enabled ? "Disable mouse effects" : "Enable mouse effects";
   const Icon = enabled ? Mouse : MouseOff;
   const id = useId();
   const [tooltip, setTooltip] = useState(false);
