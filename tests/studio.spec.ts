@@ -42,6 +42,9 @@ for (const theme of ["light", "dark"] as const)
         const heading = el.querySelector("h2")!,
           css = getComputedStyle(heading),
           r = heading.getBoundingClientRect();
+        const paragraph = el.querySelector("p")!,
+          paragraphBox = paragraph.getBoundingClientRect(),
+          paragraphCss = getComputedStyle(paragraph);
         return {
           width: box.width,
           height: box.height,
@@ -53,13 +56,18 @@ for (const theme of ["light", "dark"] as const)
           size: css.fontSize,
           border: getComputedStyle(el).borderRadius,
           color: css.color,
+          paragraphHeight: paragraphBox.height,
+          paragraphY: paragraphBox.y - box.y,
+          paragraphSize: paragraphCss.fontSize,
+          paragraphFont: paragraphCss.fontFamily,
         };
       });
       const reference =
         width === 375
           ? {
               width: 331,
-              height: 206.1875,
+              // Keep the reference spacing while allowing native line wrapping.
+              height: 175.59375 + metrics.paragraphHeight,
               logoWidth: 65,
               logoX: 26,
               headingX: 113,
@@ -77,6 +85,12 @@ for (const theme of ["light", "dark"] as const)
         expect(metrics[key as keyof typeof reference]).toBeCloseTo(value, 1);
       expect(metrics.font).toBe('"Space Grotesk Variable", sans-serif');
       expect(metrics.size).toBe(width === 375 ? "25px" : "35px");
+      expect(metrics.paragraphSize).toBe(width === 375 ? "9px" : "11px");
+      expect(metrics.paragraphFont).toBe('"Manrope Variable", sans-serif');
+      expect(metrics.paragraphY).toBeCloseTo(
+        width === 375 ? 109.59375 : 105.984375,
+        1,
+      );
       expect(metrics.border).toBe("7px");
       expect(metrics.color).toBe(
         theme === "light" ? "rgb(25, 28, 50)" : "rgb(246, 240, 228)",
