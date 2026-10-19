@@ -9,9 +9,16 @@ for (const theme of ["light", "dark"] as const)
       await page.setViewportSize({ width, height: 1000 });
       await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
       await page.goto("/");
-      await page.evaluate(() => document.fonts.ready);
       const banner = page.locator("a.studio");
       await banner.scrollIntoViewIfNeeded();
+      // Load the banner's faces explicitly before measuring its narrow layout.
+      await page.evaluate(async () => {
+        await Promise.all([
+          document.fonts.load('400 9px "Manrope Variable"'),
+          document.fonts.load('500 25px "Space Grotesk Variable"'),
+        ]);
+        await document.fonts.ready;
+      });
       await expect(banner).toHaveAttribute("href", "https://oxog.net");
       await expect(banner.locator(".eyebrow")).toHaveText(
         "PART OF A BIGGER PICTURE",
