@@ -2,20 +2,23 @@
 
 Verified on **2026-10-18**, using the official npm registry `latest` dist-tags, Node release index, current framework documentation, and GitHub releases APIs. No alpha, beta, RC, canary, or preview package versions are selected. All direct versions are exact; `package-lock.json` records transitive versions and integrity hashes.
 
-| Component               | Stable version | Official source                                                                                       |
-| ----------------------- | -------------- | ----------------------------------------------------------------------------------------------------- |
-| Next.js                 | 16.4.2         | https://nextjs.org/docs/pages and https://registry.npmjs.org/next/latest                              |
-| React / React DOM       | 19.3.1         | https://react.dev/versions and https://registry.npmjs.org/react/latest                                |
-| TypeScript              | 7.0.2          | https://www.typescriptlang.org/download/ and https://registry.npmjs.org/typescript/latest             |
-| Node.js                 | 26.12.0        | https://nodejs.org/dist/index.json                                                                    |
-| npm                     | 12.2.0         | https://registry.npmjs.org/npm/latest                                                                 |
-| Playwright Test         | 1.64.1         | https://registry.npmjs.org/@playwright/test/latest                                                    |
-| Node types              | 26.6.5         | https://registry.npmjs.org/@types/node/latest                                                         |
-| React / React DOM types | 19.3.0         | https://registry.npmjs.org/@types/react/latest and https://registry.npmjs.org/@types/react-dom/latest |
-| Sharp                   | 0.35.5         | https://registry.npmjs.org/sharp/latest                                                               |
-| Prettier                | 3.9.10         | https://registry.npmjs.org/prettier/latest                                                            |
-| Lucide React            | 1.59.0         | https://registry.npmjs.org/lucide-react/latest                                                        |
-| Manrope variable font   | 5.3.0          | https://registry.npmjs.org/@fontsource-variable/manrope/latest                                        |
+| Component                   | Stable version | Official source                                                                                       |
+| --------------------------- | -------------- | ----------------------------------------------------------------------------------------------------- |
+| Next.js                     | 16.4.2         | https://nextjs.org/docs/pages and https://registry.npmjs.org/next/latest                              |
+| React / React DOM           | 19.3.1         | https://react.dev/versions and https://registry.npmjs.org/react/latest                                |
+| TypeScript                  | 7.0.2          | https://www.typescriptlang.org/download/ and https://registry.npmjs.org/typescript/latest             |
+| Node.js                     | 26.12.0        | https://nodejs.org/dist/index.json                                                                    |
+| npm                         | 12.2.0         | https://registry.npmjs.org/npm/latest                                                                 |
+| Playwright Test             | 1.64.1         | https://registry.npmjs.org/@playwright/test/latest                                                    |
+| Node types                  | 26.6.5         | https://registry.npmjs.org/@types/node/latest                                                         |
+| React / React DOM types     | 19.3.0         | https://registry.npmjs.org/@types/react/latest and https://registry.npmjs.org/@types/react-dom/latest |
+| Sharp                       | 0.35.5         | https://registry.npmjs.org/sharp/latest                                                               |
+| Prettier                    | 3.9.10         | https://registry.npmjs.org/prettier/latest                                                            |
+| Lucide React                | 1.59.0         | https://registry.npmjs.org/lucide-react/latest                                                        |
+| Manrope variable font       | 5.3.0          | https://registry.npmjs.org/@fontsource-variable/manrope/latest                                        |
+| Space Grotesk variable font | 5.3.0          | https://registry.npmjs.org/@fontsource-variable/space-grotesk/latest                                  |
+
+Space Grotesk was additionally verified against its official npm `latest` dist-tag on **2026-10-19** for the Oxog footer banner. Its version and integrity are recorded in the lockfile.
 
 Node's official Windows binary was checked against the published SHA256SUMS before local installation in ignored task storage. Local install, typechecking, build, export, and browser tests run under this Node and npm pair. `engine-strict=true` prevents accidental installs with a different toolchain.
 

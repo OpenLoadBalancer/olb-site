@@ -266,7 +266,7 @@ test("reduced motion disables traffic and signature animations", async ({
   await page.goto("/");
   await page.locator(".studio").scrollIntoViewIfNeeded();
   await expect(
-    page.getByRole("link", { name: "OXOGNET", exact: true }),
+    page.getByRole("link", { name: /PART OF A BIGGER PICTURE/ }),
   ).toBeVisible();
   expect(
     await page
@@ -275,18 +275,21 @@ test("reduced motion disables traffic and signature animations", async ({
   ).toBe("none");
   expect(
     await page
-      .locator(".studio-symbol path")
+      .locator(".oxog-mark path")
       .first()
       .evaluate((el) => getComputedStyle(el).animationName),
   ).toBe("none");
 });
-test("studio signature draws when it enters view and finishes fully visible", async ({
+test("Oxog logo repeats Mammoth's six-second drawing animation when visible", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() =>
+    localStorage.setItem("olb-background-motion", "off"),
+  );
   await page.goto("/");
   await page.locator(".studio").scrollIntoViewIfNeeded();
-  const paths = page.locator(".studio-symbol path");
+  const paths = page.locator(".oxog-mark path");
   await expect
     .poll(() =>
       paths
@@ -299,21 +302,44 @@ test("studio signature draws when it enters view and finishes fully visible", as
         ),
     )
     .toBeGreaterThan(0);
-  await expect
-    .poll(() =>
-      paths.evaluateAll((elements) =>
-        elements.every(
-          (el) => parseFloat(getComputedStyle(el).strokeDashoffset) === 0,
-        ),
-      ),
-    )
-    .toBe(true);
+  const timing = await paths.evaluateAll((elements) =>
+    elements.map((el) => {
+      const css = getComputedStyle(el);
+      return {
+        duration: css.animationDuration,
+        easing: css.animationTimingFunction,
+        repeat: css.animationIterationCount,
+        delay: css.animationDelay,
+        dash: css.strokeDasharray,
+      };
+    }),
+  );
+  expect(timing).toEqual(
+    [0, 0.15, 0.3, 0.45].map((delay) => ({
+      duration: "6s",
+      easing: "ease-in-out",
+      repeat: "infinite",
+      delay: `${delay}s`,
+      dash: "400px",
+    })),
+  );
+  const offsets = await paths.first().evaluate((el) => {
+    const animation = el.getAnimations()[0];
+    animation.pause();
+    return [1000, 3000, 6500].map((time) => {
+      animation.currentTime = time;
+      return parseFloat(getComputedStyle(el).strokeDashoffset);
+    });
+  });
+  expect(offsets[0]).toBeGreaterThan(0);
+  expect(offsets[1]).toBe(0);
+  expect(offsets[2]).toBeGreaterThan(0);
   await expect(
-    page.getByRole("link", { name: "OXOGNET", exact: true }),
+    page.getByRole("link", { name: /PART OF A BIGGER PICTURE/ }),
   ).toHaveAttribute("href", "https://oxog.net");
-  await expect(
-    page.getByRole("list", { name: "More from Oxog" }).getByRole("link"),
-  ).toHaveCount(4);
+  await expect(page.getByRole("list", { name: "More from Oxog" })).toHaveCount(
+    0,
+  );
 });
 test("all in-page navigation targets exist", async ({ page }) => {
   for (const path of ["/", "/docs/"]) {

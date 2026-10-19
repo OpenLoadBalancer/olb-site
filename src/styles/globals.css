@@ -1221,6 +1221,7 @@ pre {
 .footer {
   border-top: 1px solid var(--border);
   padding-top: 60px;
+  padding-bottom: 25px;
 }
 .footer-top {
   display: grid;
@@ -1256,18 +1257,6 @@ pre {
 .footer .brand img {
   width: 30px;
   height: 30px;
-}
-.footer-bottom {
-  display: flex;
-  gap: 35px;
-  justify-content: space-between;
-  border-top: 1px solid var(--border);
-  padding: 22px 0;
-  font-size: 9px;
-  color: var(--muted);
-}
-.footer-bottom > span {
-  margin-right: auto;
 }
 @keyframes traffic {
   to {
@@ -2173,15 +2162,6 @@ pre {
   }
   .footer-top > div:last-child > .eyebrow {
     grid-column: span 2;
-  }
-  .footer-bottom {
-    gap: 16px;
-    flex-wrap: wrap;
-    font-size: 8px;
-    line-height: 1.8;
-  }
-  .footer-bottom > span {
-    flex-basis: 100%;
   }
   .doc-hero {
     padding-block: 50px 35px;

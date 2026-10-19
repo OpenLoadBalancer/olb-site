@@ -33,7 +33,7 @@ The preview serves `out/` at http://127.0.0.1:4173. Tests cover three routes at 
 - Pages Router deliberately uses the installed stable React release; the App Router bundles React canary internally according to the current Next.js installation documentation.
 - Native CSS animations, real SVG request diagrams, and React state for the illustrative traffic explorer. It does not connect to a running load balancer or represent measured traffic.
 - Light/dark/system preference is applied synchronously in the document head before paint, persists in localStorage, and follows OS and cross-tab changes.
-- Local Geist font, with the original SIL OFL license. No runtime font or third-party CDN requests.
+- Local Geist, Manrope, and Space Grotesk fonts under the SIL OFL license. Fonts are served with the site; there are no third-party font or CDN requests.
 - A reference-based five-way traffic-routing SVG mark, monochrome variants, light/dark wordmarks, PNG Open Graph artwork, sitemap, robots, custom 404, and brand downloads are included.
 
 ## Deploy

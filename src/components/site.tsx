@@ -251,21 +251,13 @@ function Footer() {
           </div>
           <div>
             <span className="eyebrow">Resources</span>
+            <a href="/brand/">Brand assets</a>
             <a href={`${docs}/production-deployment.md`}>Production guide</a>
             <a href={`${docs}/troubleshooting.md`}>Troubleshooting</a>
             <a href={`${repo}/blob/main/LICENSE`}>Apache 2.0 license</a>
           </div>
         </div>
         <Studio />
-        <div className="footer-bottom">
-          <span>OpenLoadBalancer · Open source. Open infrastructure.</span>
-          <a href="/brand/">
-            Brand assets <Arrow diagonal />
-          </a>
-          <a href="https://github.com/openloadbalancer/olb-site">
-            Website source <Arrow diagonal />
-          </a>
-        </div>
       </div>
     </footer>
   );
