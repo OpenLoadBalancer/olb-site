@@ -1,10 +1,15 @@
-@font-face {
-  font-family: Geist;
-  src: url("/fonts/geist-latin.woff2") format("woff2");
-  font-weight: 100 900;
-  font-display: swap;
-}
 :root {
+  --font-space-grotesk: "Space Grotesk", "Space Grotesk Fallback", sans-serif;
+  --font-jetbrains: "JetBrains Mono", "JetBrains Mono Fallback", monospace;
+  --font-quicksand: "Quicksand", "Quicksand Fallback", sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --text-small: 0.875rem;
+  --text-caption: 0.75rem;
   --bg: #0a1220;
   --surface: #101d30;
   --surface-2: #192b43;
@@ -47,14 +52,15 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 100px;
+  scroll-padding-top: calc(var(--header-height) + 24px);
 }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: Geist, Arial, Helvetica, sans-serif;
-  font-size: 15px;
+  font-family: var(--font-space-grotesk);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 button,
@@ -120,7 +126,7 @@ h3 {
 }
 code,
 .mono {
-  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  font-family: var(--font-jetbrains);
 }
 p code {
   font-size: 0.88em;
@@ -136,7 +142,7 @@ p code {
   padding-block: var(--section);
 }
 .eyebrow {
-  font-family: Geist, Arial, sans-serif;
+  font-family: var(--font-space-grotesk);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.8px;
@@ -157,6 +163,7 @@ p code {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.5;
+  min-height: 24px;
 }
 .text-link:hover {
   color: var(--accent);
@@ -326,6 +333,9 @@ p code {
   line-height: 1.5;
   white-space: nowrap;
   box-shadow: 0 6px 18px #0002;
+  max-width: calc(100vw - 24px);
+  white-space: normal;
+  width: max-content;
 }
 @media (max-width: 360px) {
   .header .header-inner,
@@ -616,13 +626,13 @@ h1 {
 }
 .svg-caption {
   fill: var(--muted);
-  font-family: Geist, Arial, sans-serif;
+  font-family: var(--font-space-grotesk);
   font-size: 8px;
   letter-spacing: 0.65px;
 }
 .svg-server {
   fill: var(--text);
-  font-family: Consolas, monospace;
+  font-family: var(--font-jetbrains);
   font-size: 11px;
 }
 .backend-status {
@@ -682,6 +692,7 @@ h1 {
   font-size: 10px;
   padding: 8px;
   max-width: 150px;
+  min-height: 36px;
 }
 .failover-toggle {
   background: none;
@@ -691,6 +702,7 @@ h1 {
   gap: 7px;
   font-size: 9px;
   padding: 8px 0;
+  min-height: 36px;
 }
 .switch {
   width: 23px;
@@ -825,7 +837,7 @@ h1 {
   margin-bottom: 35px;
 }
 .algorithm-cloud > span {
-  font-family: Consolas, monospace;
+  font-family: var(--font-jetbrains);
   font-size: 9px;
   padding: 8px 10px;
   border: 1px solid var(--border);
@@ -853,7 +865,7 @@ h1 {
   border-block: 1px solid var(--border);
 }
 .technical-stamp {
-  font-family: Consolas, monospace;
+  font-family: var(--font-jetbrains);
   font-size: 10px;
   line-height: 2;
   color: var(--muted);
@@ -933,7 +945,7 @@ h1 {
   border-bottom: 1px solid var(--border);
 }
 .case-number {
-  font-family: Consolas, monospace;
+  font-family: var(--font-jetbrains);
   font-size: 10px;
   color: var(--muted);
   padding-top: 2px;
@@ -998,16 +1010,22 @@ h1 {
   min-width: 0;
 }
 .code-bar {
-  height: 43px;
-  display: flex;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   border-bottom: 1px solid var(--border);
-  padding: 0 15px;
+  padding: var(--space-2) var(--space-3);
   color: var(--muted);
-  font-family: Consolas, monospace;
+  font-family: var(--font-jetbrains);
   font-size: 9px;
+}
+.code-bar > span:nth-child(2) {
+  min-width: 0;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 .code-bar > span:first-child {
   display: flex;
@@ -1023,12 +1041,15 @@ h1 {
   background: var(--accent);
 }
 .code-bar button {
-  font-family: Geist, Arial, sans-serif;
+  font-family: var(--font-space-grotesk);
   font-size: 9px;
   border: 1px solid var(--border);
   background: var(--surface);
   padding: 5px 8px;
   border-radius: 3px;
+  min-height: 32px;
+  min-width: 44px;
+  line-height: 1.4;
 }
 .code-bar button:hover {
   border-color: var(--muted);
@@ -1036,11 +1057,14 @@ h1 {
 pre {
   padding: 21px 20px;
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   overflow: auto;
   tab-size: 2;
   color: var(--code);
+}
+pre:focus-visible {
+  outline-offset: -4px;
 }
 .code-line {
   display: flex;
@@ -1051,7 +1075,7 @@ pre {
   min-width: 34px;
   flex-shrink: 0;
   user-select: none;
-  color: var(--border-strong);
+  color: var(--muted);
   font-size: 9px;
   line-height: 2.32;
 }
@@ -1247,6 +1271,9 @@ pre {
 .footer-top > div > a:not(.brand) {
   font-size: 11px;
   color: var(--muted);
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 .footer-top > div > a:hover {
   color: var(--text);
@@ -1290,6 +1317,13 @@ pre {
   gap: 20px;
   font-size: 12px;
   color: var(--muted);
+  max-height: calc(100dvh - 144px);
+  overflow-y: auto;
+}
+.docs-sidebar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
 }
 .docs-sidebar a:hover {
   color: var(--accent);
@@ -1309,7 +1343,7 @@ pre {
 }
 .docs-content p,
 .docs-content li {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.9;
   color: var(--muted);
 }
@@ -1378,8 +1412,12 @@ pre {
   color: #142d49;
 }
 .brand-tile a {
-  font-size: 12px;
+  font-size: var(--text-small);
   text-decoration: underline;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
 }
 .not-found {
   padding-block: 130px;
@@ -1477,7 +1515,7 @@ pre {
   }
   .code-bar {
     font-size: 11px;
-    height: 48px;
+    min-height: 48px;
   }
   .code-bar button {
     font-size: 11px;
@@ -1814,6 +1852,8 @@ pre {
   }
   .docs-sidebar {
     position: static;
+    max-height: none;
+    overflow: visible;
     flex-direction: row;
     flex-wrap: wrap;
     padding-bottom: 25px;
@@ -1863,6 +1903,11 @@ pre {
     align-items: stretch;
     gap: 3px;
     box-shadow: 0 20px 25px #0002;
+    max-height: calc(
+      100dvh - var(--header-height) - env(safe-area-inset-bottom)
+    );
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .navigation.is-open {
     display: flex;
@@ -1872,8 +1917,8 @@ pre {
     padding: 15px 0;
   }
   .icon-button {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
   }
 
   .hero {
@@ -1896,7 +1941,7 @@ pre {
     font-size: 22px;
   }
   .hero-detail {
-    font-size: 13px;
+    font-size: var(--text-small);
   }
   .hero-buttons {
     gap: 10px;
@@ -1934,22 +1979,23 @@ pre {
   .console-controls {
     padding: 12px;
     gap: 7px;
+    flex-wrap: wrap;
   }
   .console-controls label {
-    font-size: 8px;
+    font-size: var(--text-caption);
     gap: 6px;
   }
   .console-controls select {
-    font-size: 9px;
-    width: 117px;
+    font-size: var(--text-caption);
+    width: 140px;
     padding: 7px 3px;
   }
   .failover-toggle {
-    font-size: 8px;
+    font-size: var(--text-caption);
     gap: 5px;
   }
   .console-note {
-    font-size: 7px;
+    font-size: var(--text-caption);
     line-height: 1.6;
     padding: 10px 12px;
     min-height: 45px;
@@ -2006,7 +2052,7 @@ pre {
     margin-bottom: 20px;
   }
   .feature-grid p {
-    font-size: 13px;
+    font-size: var(--text-small);
     max-width: none;
   }
   .feature-featured .mini-chart {
@@ -2077,15 +2123,15 @@ pre {
     font-size: 9px;
   }
   pre {
-    font-size: 10px;
+    font-size: 12px;
     padding: 20px 15px;
   }
   .code-bar {
-    font-size: 8px;
+    font-size: 11px;
     padding: 0 12px;
   }
   .code-bar button {
-    font-size: 8px;
+    font-size: var(--text-caption);
   }
   .quick-steps strong {
     font-size: 13px;
@@ -2099,12 +2145,12 @@ pre {
   }
   .config-column pre {
     padding: 20px 15px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .line-no {
     min-width: 28px;
-    font-size: 8px;
-    line-height: 2.38;
+    font-size: 10px;
+    line-height: inherit;
   }
   .ecosystem h2 {
     font-size: 32px;
@@ -2182,14 +2228,14 @@ pre {
   }
   .docs-content p,
   .docs-content li {
-    font-size: 13px;
+    font-size: 15px;
   }
   .docs-sidebar {
-    font-size: 11px;
+    font-size: var(--text-caption);
     gap: 17px;
   }
   .docs-content pre {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

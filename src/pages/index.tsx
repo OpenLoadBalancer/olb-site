@@ -102,7 +102,9 @@ export default function Home() {
         </div>
         <div className="feature-grid">
           <article className="feature-featured">
-            <div className="feature-icon">⇄</div>
+            <div className="feature-icon" aria-hidden="true">
+              ⇄
+            </div>
             <span className="eyebrow">INTELLIGENT DISTRIBUTION</span>
             <h3>
               The right backend.
@@ -141,7 +143,9 @@ export default function Home() {
             </span>
           </article>
           <article>
-            <div className="feature-icon">⌁</div>
+            <div className="feature-icon" aria-hidden="true">
+              ⌁
+            </div>
             <h3>A healthier path forward.</h3>
             <p>
               Active and passive health checks, circuit breakers, and graceful
@@ -152,7 +156,9 @@ export default function Home() {
             </a>
           </article>
           <article>
-            <div className="feature-icon shield-icon">◇</div>
+            <div className="feature-icon shield-icon" aria-hidden="true">
+              ◇
+            </div>
             <h3>Protection at the edge.</h3>
             <p>
               TLS termination, automatic ACME certificates, mTLS, and a
@@ -163,7 +169,9 @@ export default function Home() {
             </a>
           </article>
           <article>
-            <div className="feature-icon">⌘</div>
+            <div className="feature-icon" aria-hidden="true">
+              ⌘
+            </div>
             <h3>See what’s happening.</h3>
             <p>
               A built-in web dashboard, Prometheus metrics, and structured logs.
@@ -174,7 +182,9 @@ export default function Home() {
             </a>
           </article>
           <article>
-            <div className="feature-icon">⌬</div>
+            <div className="feature-icon" aria-hidden="true">
+              ⌬
+            </div>
             <h3>Ready for your next node.</h3>
             <p>
               Raft consensus and SWIM gossip coordinate your cluster. Discover
@@ -406,7 +416,7 @@ export default function Home() {
         </SectionTitle>
         <div className="ecosystem-links">
           <a href={repo}>
-            <span>⌘</span>
+            <span aria-hidden="true">⌘</span>
             <div>
               <h3>Explore the code</h3>
               <p>Built in Go. Yours to understand.</p>
@@ -414,7 +424,7 @@ export default function Home() {
             <Arrow diagonal />
           </a>
           <a href={`${repo}/issues`}>
-            <span>↳</span>
+            <span aria-hidden="true">↳</span>
             <div>
               <h3>Join the conversation</h3>
               <p>Report an issue or suggest what’s next.</p>
@@ -422,7 +432,7 @@ export default function Home() {
             <Arrow diagonal />
           </a>
           <a href={`${docs}/mcp.md`}>
-            <span>✳</span>
+            <span aria-hidden="true">✳</span>
             <div>
               <h3>Connect your AI tools</h3>
               <p>Monitor and manage through MCP.</p>

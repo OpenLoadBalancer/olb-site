@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-const widths = [375, 768, 1024, 1440, 1920, 2560, 3840];
+const widths = [320, 375, 390, 768, 1024, 1280, 1440, 1920, 2560, 3840];
 for (const theme of ["light", "dark"])
   for (const width of widths) {
     test(`${theme} layout at ${width}px`, async ({ page }) => {

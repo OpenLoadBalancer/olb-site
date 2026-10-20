@@ -33,13 +33,47 @@ export function Logo() {
     </a>
   );
 }
-function Header() {
+function Header({ path }: { path: string }) {
   const [mobile, setMobile] = useState(false);
+  const navigation = useRef<HTMLElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobile) return;
+    navigation.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    function close(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setMobile(false);
+      menuButton.current?.focus();
+    }
+    function dismiss(event: PointerEvent | FocusEvent) {
+      if (
+        event.target instanceof Node &&
+        !navigation.current?.contains(event.target) &&
+        !menuButton.current?.contains(event.target)
+      )
+        setMobile(false);
+    }
+    const desktop = matchMedia("(min-width: 601px)");
+    const resize = () => {
+      if (desktop.matches) setMobile(false);
+    };
+    document.addEventListener("keydown", close);
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("focusin", dismiss);
+    desktop.addEventListener("change", resize);
+    return () => {
+      document.removeEventListener("keydown", close);
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("focusin", dismiss);
+      desktop.removeEventListener("change", resize);
+    };
+  }, [mobile]);
   return (
     <header className="header">
       <div className="container header-inner">
         <Logo />
         <nav
+          ref={navigation}
           className={mobile ? "navigation is-open" : "navigation"}
           aria-label="Main navigation"
           onClick={() => setMobile(false)}
@@ -48,7 +82,10 @@ function Header() {
           <a href="/#features">Features</a>
           <a href="/#architecture">Architecture</a>
           <a href="/#quick-start">Quick start</a>
-          <a href="/docs/">
+          <a
+            href="/docs/"
+            aria-current={path === "/docs/" ? "page" : undefined}
+          >
             Docs <Arrow diagonal />
           </a>
         </nav>
@@ -72,6 +109,7 @@ function Header() {
             <span>GitHub</span>
           </a>
           <button
+            ref={menuButton}
             className="icon-button mobile-toggle"
             aria-label={mobile ? "Close navigation" : "Open navigation"}
             aria-expanded={mobile}
@@ -139,7 +177,11 @@ export function Code({
         </code>
       </pre>
       <span className="sr-only" role="status">
-        {status === "Copied!" ? `${label} copied to clipboard` : ""}
+        {status === "Copied!"
+          ? `${label} copied to clipboard`
+          : status === "Select code to copy"
+            ? `Clipboard unavailable. Select the ${label} code to copy it manually.`
+            : ""}
       </span>
     </div>
   );
@@ -219,7 +261,7 @@ export function Site({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Header />
+        <Header path={path} />
         <main id="main">{children}</main>
         <Footer />
       </div>

@@ -5,7 +5,7 @@
   --picker-muted: oklch(0.48 0.035 263);
   --picker-blue: #124fda;
   --picker-line: oklch(0.9 0.018 263);
-  font-family: "Manrope Variable", sans-serif;
+  font-family: var(--font-space-grotesk);
   font-size: 0.875rem;
   line-height: 1.7;
 }
@@ -77,6 +77,9 @@
     color-mix(in srgb, #071a3d 24%, transparent);
   animation: theme-panel-in 0.18s ease-out;
   transform-origin: top right;
+  max-height: calc(100dvh - var(--header-height) - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .theme-panel-heading {
   display: flex;
@@ -292,6 +295,9 @@
     width: auto;
     max-width: 22rem;
     margin-left: auto;
+    max-height: calc(
+      100dvh - var(--header-height) - 1.25rem - env(safe-area-inset-bottom)
+    );
   }
 }
 
