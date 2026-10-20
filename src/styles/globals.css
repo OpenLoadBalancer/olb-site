@@ -313,17 +313,23 @@ p code {
   background: transparent;
 }
 .motion-toggle[aria-pressed="false"] svg {
-  opacity: 0.6;
+  opacity: 0.85;
 }
 .motion-toggle:hover {
   border-color: var(--accent);
   background: var(--surface-2);
 }
-.motion-tooltip {
+.motion-tooltip-region {
   position: absolute;
   right: 0;
-  top: calc(100% + 10px);
+  top: 100%;
   z-index: 6;
+  padding-top: 10px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+}
+.motion-tooltip {
+  display: block;
   padding: 8px 11px;
   border: 1px solid var(--border-strong);
   border-radius: 7px;
@@ -678,7 +684,7 @@ h1 {
   border-top: 1px solid var(--border);
 }
 .console-controls label {
-  font-size: 9px;
+  font-size: var(--text-caption);
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -689,7 +695,7 @@ h1 {
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--text-caption);
   padding: 8px;
   max-width: 150px;
   min-height: 36px;
@@ -700,7 +706,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 9px;
+  font-size: var(--text-caption);
   padding: 8px 0;
   min-height: 36px;
 }
@@ -735,7 +741,7 @@ h1 {
   align-items: center;
   min-height: 40px;
   padding: 12px 21px;
-  font-size: 8px;
+  font-size: var(--text-caption);
   color: var(--muted);
   border-top: 1px solid var(--border);
   background: var(--surface-2);
@@ -844,7 +850,10 @@ h1 {
   border-radius: 3px;
 }
 .algorithm-cloud a {
-  font-size: 9px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: var(--text-caption);
   width: 100%;
   color: var(--accent);
   margin-top: 7px;
@@ -1042,7 +1051,7 @@ h1 {
 }
 .code-bar button {
   font-family: var(--font-space-grotesk);
-  font-size: 9px;
+  font-size: var(--text-caption);
   border: 1px solid var(--border);
   background: var(--surface);
   padding: 5px 8px;
@@ -1456,14 +1465,14 @@ pre:focus-visible {
   }
   .console-controls label,
   .failover-toggle {
-    font-size: 11px;
+    font-size: var(--text-caption);
   }
   .console-note {
-    font-size: 10px;
+    font-size: var(--text-caption);
     padding: 15px 28px;
   }
   .console-controls select {
-    font-size: 12px;
+    font-size: var(--text-caption);
     max-width: 180px;
   }
   .feature-grid p {
@@ -1518,7 +1527,7 @@ pre:focus-visible {
     min-height: 48px;
   }
   .code-bar button {
-    font-size: 11px;
+    font-size: var(--text-caption);
   }
   .use-case-list h3 {
     font-size: 29px;
@@ -1586,7 +1595,7 @@ pre:focus-visible {
     font-size: 7px;
   }
   .console-note {
-    font-size: 7px;
+    font-size: var(--text-caption);
     padding: 10px 12px;
   }
   .diagram-label {
@@ -1714,7 +1723,7 @@ pre:focus-visible {
   }
   .console-note {
     padding: 14px 20px;
-    font-size: 9px;
+    font-size: var(--text-caption);
   }
   .diagram-label {
     padding: 23px 23px 0;
@@ -1939,6 +1948,9 @@ pre:focus-visible {
   }
   .hero-description {
     font-size: 22px;
+  }
+  .desktop-break {
+    display: none;
   }
   .hero-detail {
     font-size: var(--text-small);

@@ -23,7 +23,7 @@ npm test
 npm run preview
 ```
 
-The preview serves `out/` at http://127.0.0.1:4173. Tests cover three routes at 375, 768, 1024, 1440, 1920, 2560, and 3840 pixels in both themes, plus user interactions. Full-page screenshots are written to `test-results/screenshots/`.
+The preview serves `out/` at http://127.0.0.1:4173. Layout tests cover three routes at 320, 375, 390, 768, 1024, 1280, 1440, 1920, 2560, and 3840 pixels in both themes, plus short viewports, keyboard navigation and user interactions. Full-page screenshots are written to `test-results/screenshots/`.
 
 `npm run versions:check` checks direct dependencies, npm, Node, and the lockfile against official registries. This is an explicit maintenance check; a future upstream release can make it fail without affecting the reproducibility of the pinned build.
 
@@ -33,7 +33,7 @@ The preview serves `out/` at http://127.0.0.1:4173. Tests cover three routes at 
 - Pages Router deliberately uses the installed stable React release; the App Router bundles React canary internally according to the current Next.js installation documentation.
 - Native CSS animations, real SVG request diagrams, and React state for the illustrative traffic explorer. It does not connect to a running load balancer or represent measured traffic.
 - Light/dark/system preference is applied synchronously in the document head before paint, persists in localStorage, and follows OS and cross-tab changes.
-- Local Geist, Manrope, and Space Grotesk fonts under the SIL OFL license. Fonts are served with the site; there are no third-party font or CDN requests.
+- Local Space Grotesk for the interface and JetBrains Mono for code, with `next/font/local` and stable CSS variables. The Oxog banner retains its reference typography; logo artwork stays unchanged. Font sources, versions, licenses and hashes are documented in [FONTS.md](docs/FONTS.md). There are no third-party font or CDN requests.
 - A reference-based five-way traffic-routing SVG mark, monochrome variants, light/dark wordmarks, PNG Open Graph artwork, sitemap, robots, custom 404, and brand downloads are included.
 
 ## Deploy
